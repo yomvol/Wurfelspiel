@@ -912,9 +912,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 360f43b70c4bc0945b0b66763356c856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallHeight: 100
   impulseStrength: 1
-  angularVelocity: 1
+  angularVelocity: 0.03
 --- !u!1 &1486840850
 GameObject:
   m_ObjectHideFlags: 0

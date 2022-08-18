@@ -37,7 +37,7 @@ public class TestRoll : MonoBehaviour
         if (Keyboard.current.rKey.isPressed)
         {
             Vector3 impulse = new Vector3();
-            impulse.y = transform.position.y;
+            impulse.y = 0;
             float angleOfImpulse = Random.Range(0.01f, 2 * MathF.PI);
             impulse.x = MathF.Cos(angleOfImpulse) * impulseStrength;
             impulse.z = MathF.Sin(angleOfImpulse) * impulseStrength;
@@ -80,27 +80,31 @@ public class TestRoll : MonoBehaviour
     {
         if (collision.gameObject.name == "TableTop")
         {
-            _raysFromFaces[0] = new Tuple<DiceFace, Ray>(DiceFace.One, new Ray(transform.position, transform.right));
-            _raysFromFaces[1] = new Tuple<DiceFace, Ray>(DiceFace.Two, new Ray(transform.position, transform.up * -1.0f));
-            _raysFromFaces[2] = new Tuple<DiceFace, Ray>(DiceFace.Three, new Ray(transform.position, transform.right * -1.0f)); // left
-            _raysFromFaces[3] = new Tuple<DiceFace, Ray>(DiceFace.Four, new Ray(transform.position, transform.up));
-            _raysFromFaces[4] = new Tuple<DiceFace, Ray>(DiceFace.Five, new Ray(transform.position, transform.forward * -1.0f));
-            _raysFromFaces[5] = new Tuple<DiceFace, Ray>(DiceFace.Six, new Ray(transform.position, transform.forward));
+            Invoke("RaycastForResults", 1);
+        }
+    }
 
-            for (int i = 0; i < _raysFromFaces.Length; i++)
+    private void RaycastForResults()
+    {
+        _raysFromFaces[0] = new Tuple<DiceFace, Ray>(DiceFace.One, new Ray(transform.position, transform.right));
+        _raysFromFaces[1] = new Tuple<DiceFace, Ray>(DiceFace.Two, new Ray(transform.position, transform.up * -1.0f));
+        _raysFromFaces[2] = new Tuple<DiceFace, Ray>(DiceFace.Three, new Ray(transform.position, transform.right * -1.0f)); // left
+        _raysFromFaces[3] = new Tuple<DiceFace, Ray>(DiceFace.Four, new Ray(transform.position, transform.up));
+        _raysFromFaces[4] = new Tuple<DiceFace, Ray>(DiceFace.Five, new Ray(transform.position, transform.forward * -1.0f));
+        _raysFromFaces[5] = new Tuple<DiceFace, Ray>(DiceFace.Six, new Ray(transform.position, transform.forward));
+
+        for (int i = 0; i < _raysFromFaces.Length; i++)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(_raysFromFaces[i].Item2, out hit, 10))
             {
-                RaycastHit hit;
-                if (Physics.Raycast(_raysFromFaces[i].Item2, out hit, 10))
+                Debug.Log(hit.transform.name);
+                if (hit.transform.name == "TableTop")
                 {
-                    Debug.Log(hit.transform.name);
-                    if (hit.transform.name == "TableTop")
-                    {
-                        Debug.Log($"You`ve got {_raysFromFaces[i].Item1}");
-                    }
+                    Debug.Log($"You`ve got {_raysFromFaces[i].Item1}");
                 }
-                _raysFromFaces[i] = null;
             }
-            
+            _raysFromFaces[i] = null;
         }
     }
 }
