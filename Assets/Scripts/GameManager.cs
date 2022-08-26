@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using Cinemachine;
 
 [Serializable]
 public enum GameState
@@ -7,24 +9,32 @@ public enum GameState
     Starting,
     PlayerTurn,
     OpponentTurn,
+    Reroll,
     HandsEvaluation,
     Win,
     Draw,
     Lose
 }
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
     public static event Action<GameState> OnBeforeStateChanged;
     public static event Action<GameState> OnAfterStateChanged;
 
     public GameState State { get; private set; }
+    public GameObject player;
+    public CinemachineVirtualCamera diceZoomInCamera;
+    public CinemachineTargetGroup diceTargetGroup;
+
+    private HumanPlayer _humanPlayer;
 
     // Kick the game off with the first state
-    void Start() => ChangeState(GameState.Starting);
+    void Start() => StartCoroutine(ChangeState(GameState.Starting, 0));
 
-    public void ChangeState(GameState newState)
+    public IEnumerator ChangeState(GameState newState, float delayTime = 0f)
     {
+        yield return new WaitForSeconds(delayTime);
+
         OnBeforeStateChanged?.Invoke(newState);
 
         State = newState;
@@ -34,9 +44,14 @@ public class GameManager : MonoBehaviour
                 HandleStarting();
                 break;
             case GameState.PlayerTurn:
-
+                HandlePlayerTurn();
+                break;
+            case GameState.Reroll:
+                HandleReroll();
                 break;
             case GameState.Win:
+                break;
+            case GameState.Draw:
                 break;
             case GameState.Lose:
                 break;
@@ -51,16 +66,29 @@ public class GameManager : MonoBehaviour
 
     private void HandleStarting()
     {
-        // Do some start setup, could be environment, cinematics etc
+        _humanPlayer = player.GetComponent<HumanPlayer>();
+        Transform[] diceTransforms = player.GetComponentsInChildren<Transform>();
+        foreach(var transform in diceTransforms)
+        {
+            if (transform == diceTransforms[0])
+                continue;
+            diceTargetGroup.AddMember(transform, 1, 0);
+        }
 
-
-        ChangeState(GameState.PlayerTurn);
+        StartCoroutine(ChangeState(GameState.PlayerTurn, 1.0f));
     }
 
     private void HandlePlayerTurn()
     {
+        _humanPlayer.ThrowDices();
+        diceZoomInCamera.Priority = 11;
 
+        StartCoroutine(ChangeState(GameState.Reroll));
+    }
 
-        ChangeState(GameState.OpponentTurn);
+    private void HandleReroll()
+    {
+        // Every reroll is optional
+        _humanPlayer.isRerolling = true;
     }
 }

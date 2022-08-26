@@ -6,25 +6,29 @@ public class DiceRoll : MonoBehaviour
 {
     public float impulseStrength; // module of the force vector
     public float angularVelocity;
+    [HideInInspector]
+    public DiceFace rollResult;
+    public event EventHandler resultReadyEvent;
 
     private Tuple<DiceFace, Ray>[] _raysFromFaces;
     private Rigidbody _rigidbody;
     private BoxCollider _boxCollider;
+    private MeshRenderer _renderer;
 
     void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _boxCollider = GetComponent<BoxCollider>();
+        _renderer = GetComponent<MeshRenderer>();
+        _renderer.enabled = false;
         _raysFromFaces = new Tuple<DiceFace, Ray>[6];
         _rigidbody.useGravity = false;
+        rollResult = DiceFace.One;
     }
 
-    void FixedUpdate()
+    public void ThrowDice()
     {
-    }
-
-    private void ThrowDice()
-    {
+        _renderer.enabled = true;
         Vector3 impulse = new Vector3();
         impulse.y = 0;
         float angleOfImpulse = Random.Range(0.01f, 2 * MathF.PI);
@@ -89,6 +93,8 @@ public class DiceRoll : MonoBehaviour
                 if (hit.transform.name == "TableTop")
                 {
                     Debug.Log($"You`ve got {_raysFromFaces[i].Item1}");
+                    rollResult = _raysFromFaces[i].Item1;
+                    if (resultReadyEvent != null) resultReadyEvent(this, null);
                 }
             }
             _raysFromFaces[i] = null;
