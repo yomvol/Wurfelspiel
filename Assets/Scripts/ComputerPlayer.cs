@@ -1,98 +1,38 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
-public class Hand
+public class ComputerPlayer : BasePlayer
 {
-    // This mask acts as a digital clone of actual dice objects in game
-    public DiceFace[] mask;
-    public GameObject[] dices;
-    // This structure lets us make judgements which hand is stronger. Second and third paramaters are senior and junior kickers.
-    // Let`s say that both players have full house. The first one has 222**55, the second one has 222**66, the second one wins.
-    public Tuple<HandCombination, DiceFace, DiceFace> handPower;
-
-    public Hand()
+    private void Start()
     {
-        mask = new DiceFace[BasePlayer.NUMBER_OF_DICES];
-        dices = new GameObject[BasePlayer.NUMBER_OF_DICES];
-        handPower = new Tuple<HandCombination, DiceFace, DiceFace>(HandCombination.HighCard, DiceFace.One, DiceFace.One);
-    }
-}
-
-public abstract class BasePlayer : MonoBehaviour
-{
-    public const int NUMBER_OF_DICES = 5;
-    public GameObject dicePrefab;
-
-    protected DiceRoll[] _rolls;
-    protected List<DiceRoll> _dicesToReroll;
-    protected int _resultsReceivedCounter;
-
-    public Hand hand { get; protected set; }
-
-    protected virtual void Initialize()
-    {
-        hand = new Hand();
-        _rolls = new DiceRoll[NUMBER_OF_DICES];
-        _dicesToReroll = new List<DiceRoll>();
-        _resultsReceivedCounter = 0;
-
-        for (int i = 0; i < NUMBER_OF_DICES; i++)
-        {
-            hand.mask[i] = DiceFace.Two;
-            hand.dices[i] = Instantiate(dicePrefab, transform.position + new Vector3(0, 0, i * 0.5f), Quaternion.identity, transform);
-            _rolls[i] = hand.dices[i].GetComponent<DiceRoll>();
-        }
+        Initialize();
     }
 
-    protected virtual void ResultReadyAllDicesEventHandler(object sender, EventArgs e)
+    public override void SelectAndReroll()
     {
-        _resultsReceivedCounter++;
-
-        if (_resultsReceivedCounter >= NUMBER_OF_DICES)
+        Debug.Log("Here");
+        if (_dicesToReroll.Count > 0)
         {
-            for (int i = 0; i < NUMBER_OF_DICES; i++)
+            Debug.Log("There");
+            GameManager.Instance.diceZoomInCamera.Priority = 11;
+            for (int i = 0; i < _dicesToReroll.Count; i++)
             {
-                hand.mask[i] = _rolls[i].rollResult;
-                _rolls[i].resultReadyEvent -= ResultReadyEventHandler;
+                _dicesToReroll[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
+                _dicesToReroll[i].ThrowDice();
             }
-            _resultsReceivedCounter = 0;
-            EvaluateHand();
-            Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
+           
+            // Evaluate hand again
         }
+
+        StartCoroutine(GameManager.Instance.ChangeState(GameState.Win, 3f));
     }
 
-    protected void ResultReadyRerollDicesEventHandler(object sender, EventArgs e)
-    {
-
-    }
-
-    public virtual void ThrowDices()
-    {
-        for (int i = 0; i < NUMBER_OF_DICES; i++)
-        {
-            _rolls[i].resultReadyEvent += ResultReadyAllDicesEventHandler;
-            _rolls[i].ThrowDice();
-        }
-    }
-
-    public void ResetDicePositionsAndHide()
-    {
-        for (int i = 0; i < NUMBER_OF_DICES; i++)
-        {
-            _rolls[i].HideAndImmobilize();
-            hand.dices[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
-        }
-    }
-
-    public abstract void SelectAndReroll();
-
-    protected virtual void EvaluateHand()
+    protected override void EvaluateHand()
     {
         Array.Sort(hand.mask);
-        
+
         // Are there 3 or more dice of the same value?
         var groups = hand.mask.GroupBy(v => v);
         DictionaryEntry dominantGroup = new DictionaryEntry();
@@ -119,6 +59,15 @@ public abstract class BasePlayer : MonoBehaviour
             {
                 hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
                     (HandCombination.FourOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
+                foreach (var group in groups)
+                {
+                    if (group.Count() == 1)
+                    {
+                        int index = Array.IndexOf(hand.mask, group.Key);
+                        _dicesToReroll.Add(_rolls[index]);
+                        break;
+                    }
+                }
                 return;
             }
             else // 3 same dices. Is there a full house or no?
@@ -139,6 +88,14 @@ public abstract class BasePlayer : MonoBehaviour
                 {
                     hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
                     (HandCombination.ThreeOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
+                    foreach (var diceFace in hand.mask)
+                    {
+                        if (diceFace != (DiceFace)dominantGroup.Key)
+                        {
+                            int index = Array.IndexOf(hand.mask, diceFace);
+                            _dicesToReroll.Add(_rolls[index]);
+                        }
+                    }
                     return;
                 }
             }
@@ -167,6 +124,7 @@ public abstract class BasePlayer : MonoBehaviour
                 {
                     hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
                         (HandCombination.HighCard, DiceFace.One, DiceFace.One);
+                    _dicesToReroll.AddRange(_rolls);
                     return;
                 }
             }
@@ -180,6 +138,11 @@ public abstract class BasePlayer : MonoBehaviour
                         if (group.Count() == 2)
                         {
                             kickers.Add(group.Key);
+                        }
+                        else if (group.Count() == 1)
+                        {
+                            int index = Array.IndexOf(hand.mask, group.Key);
+                            _dicesToReroll.Add(_rolls[index]);
                         }
                     }
                     kickers.Sort();
@@ -195,6 +158,13 @@ public abstract class BasePlayer : MonoBehaviour
                         {
                             hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
                         (HandCombination.Pair, group.Key, DiceFace.One);
+                            foreach (var diceFace in hand.mask)
+                            {
+                                if (diceFace == group.Key)
+                                    continue;
+                                int index = Array.IndexOf(hand.mask, diceFace);
+                                _dicesToReroll.Add(_rolls[index]);
+                            }
                             return;
                         }
                     }
