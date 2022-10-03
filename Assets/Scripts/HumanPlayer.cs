@@ -1,34 +1,26 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class HumanPlayer : BasePlayer
 {
-    // these components handle logic interacting with a dice
-    private DiceRoll[] _rolls;
-    private int _resultsReceivedCounter;
     private SpriteRenderer[] _selectionRingRenderers;
-    private List<DiceRoll> _dicesToReroll;
     private Color32 _selectedCol;
-    private int _currentHighlightedDice;
+    private Color32 _selectedAndCursorHoveringCol;
+    
+    public int CurrentHighlightedDice;
+    [HideInInspector]
+    public bool isRerolling;
 
     protected override void Initialize()
     {
         base.Initialize();
-        _rolls = new DiceRoll[NUMBER_OF_DICES];
         _selectionRingRenderers = new SpriteRenderer[NUMBER_OF_DICES];
-        _dicesToReroll = new List<DiceRoll>();
-        _selectedCol = new Color32(255, 49, 49, 255);
-        _currentHighlightedDice = 0;
-        _resultsReceivedCounter = 0;
+        _selectedCol = new Color32(255, 120, 0, 255);
+        _selectedAndCursorHoveringCol = new Color32(255, 49, 49, 255);
 
         for (int i = 0; i < NUMBER_OF_DICES; i++)
         {
-            hand.mask[i] = DiceFace.Two;
-            hand.dices[i] = Instantiate(dicePrefab, transform.position + new Vector3(0, 0, i * 0.5f), Quaternion.identity, transform);
-            _rolls[i] = hand.dices[i].GetComponent<DiceRoll>();
             _selectionRingRenderers[i] = hand.dices[i].GetComponentInChildren<SpriteRenderer>();
         }
     }
@@ -38,7 +30,7 @@ public class HumanPlayer : BasePlayer
         Initialize();
     }
 
-    private void ResultReadyEventHandler(object sender, EventArgs e)
+    protected override void ResultReadyAllDicesEventHandler(object sender, EventArgs e)
     {
         _resultsReceivedCounter++;
 
@@ -47,75 +39,101 @@ public class HumanPlayer : BasePlayer
             for (int i = 0; i < NUMBER_OF_DICES; i++)
             {
                 hand.mask[i] = _rolls[i].rollResult;
-                _rolls[i].resultReadyEvent -= ResultReadyEventHandler;
+                _rolls[i].resultReadyEvent -= ResultReadyAllDicesEventHandler;
             }
             _resultsReceivedCounter = 0;
-            EvaluateHand();
-            Debug.Log($"You`ve got {hand.handPower.Item1} of {hand.handPower.Item2}");
+            StartCoroutine(GameManager.Instance.ChangeState(GameState.Reroll, true));
         }
     }
 
-    public override void ThrowDices()
+    public override void SelectAndReroll()
     {
-        for (int i = 0; i < NUMBER_OF_DICES; i++)
-        {
-            _rolls[i].resultReadyEvent += ResultReadyEventHandler;
-            _rolls[i].ThrowDice();
-        }
-    }
-
-    protected override void SelectAndReroll()
-    {
-        SpriteRenderer currentRenderer = _selectionRingRenderers[_currentHighlightedDice];
+        SpriteRenderer currentRenderer = _selectionRingRenderers[CurrentHighlightedDice];
         currentRenderer.transform.rotation = Quaternion.LookRotation(transform.up, transform.forward);
         currentRenderer.enabled = true;
         
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
-            _selectionRingRenderers[_currentHighlightedDice].color = _selectedCol;
-            Debug.Log(_selectedCol);
-            Debug.Log(_selectionRingRenderers[_currentHighlightedDice].color);
-            _dicesToReroll.Add(_rolls[_currentHighlightedDice]);
+            if (!_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
+            {
+                currentRenderer.color = _selectedAndCursorHoveringCol;
+                _dicesToReroll.Add(_rolls[CurrentHighlightedDice]);
+            }
+            else
+            {
+                currentRenderer.color = Color.white;
+                _dicesToReroll.Remove(_rolls[CurrentHighlightedDice]);
+            }
         }
         else if (Keyboard.current.dKey.wasPressedThisFrame)
         {
-            if (!_dicesToReroll.Contains(_rolls[_currentHighlightedDice]))
+            if (!_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
             {
-                _selectionRingRenderers[_currentHighlightedDice].enabled = false;
+                currentRenderer.enabled = false;
             }
-            _currentHighlightedDice++;
-            if (_currentHighlightedDice >= NUMBER_OF_DICES)
+            else
             {
-                _currentHighlightedDice = 0;
+                currentRenderer.color = _selectedCol;
+            }
+
+            CurrentHighlightedDice++;
+            if (CurrentHighlightedDice >= NUMBER_OF_DICES)
+            {
+                CurrentHighlightedDice = 0;
+            }
+
+            if (_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
+            {
+                _selectionRingRenderers[CurrentHighlightedDice].color = _selectedAndCursorHoveringCol;
             }
         }
         else if (Keyboard.current.aKey.wasPressedThisFrame)
         {
-            if (!_dicesToReroll.Contains(_rolls[_currentHighlightedDice]))
+            if (!_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
             {
-                _selectionRingRenderers[_currentHighlightedDice].enabled = false;
+                currentRenderer.enabled = false;
             }
-            _currentHighlightedDice--;
-            if (_currentHighlightedDice < 0)
+            else
             {
-                _currentHighlightedDice = NUMBER_OF_DICES - 1;
+                currentRenderer.color = _selectedCol;
+            }
+
+            CurrentHighlightedDice--;
+            if (CurrentHighlightedDice < 0)
+            {
+                CurrentHighlightedDice = NUMBER_OF_DICES - 1;
+            }
+
+            if (_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
+            {
+                _selectionRingRenderers[CurrentHighlightedDice].color = _selectedAndCursorHoveringCol;
             }
         }
         else if (Keyboard.current.fKey.wasPressedThisFrame)
         {
             isRerolling = false;
-            GameManager.Instance.diceZoomInCamera.Priority = 5;
-            SpriteRenderer renderer;
-            foreach (var dice in _dicesToReroll)
+            currentRenderer.enabled = false;
+            if (_dicesToReroll.Count > 0)
             {
-                renderer = dice.gameObject.GetComponentInChildren<SpriteRenderer>();
-                renderer.color = Color.white;
-                renderer.enabled = false;
-                dice.transform.position = transform.position;
-                dice.ThrowDice();
+                GameManager.Instance.diceZoomInCamera.Priority = 11;
+                SpriteRenderer renderer;
+                for (int i = 0; i < _dicesToReroll.Count; i++)
+                {
+                    renderer = _dicesToReroll[i].gameObject.GetComponentInChildren<SpriteRenderer>();
+                    renderer.color = Color.white;
+                    renderer.enabled = false;
+                    _dicesToReroll[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
+                    _dicesToReroll[i].resultReadyEvent += ResultReadyRerollDicesEventHandler;
+                    _dicesToReroll[i].ThrowDice();
+                }
             }
-            GameManager.Instance.diceZoomInCamera.Priority = 11;
-            StartCoroutine(GameManager.Instance.ChangeState(GameState.Win));
+            else
+            {
+                EvaluateHand();
+                Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
+            }
+            
+            StartCoroutine(GameManager.Instance.ChangeState(GameState.OpponentTurn, 3f));
         }
     }
 

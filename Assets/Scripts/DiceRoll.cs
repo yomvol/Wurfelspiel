@@ -15,7 +15,7 @@ public class DiceRoll : MonoBehaviour
     private BoxCollider _boxCollider;
     private MeshRenderer _renderer;
 
-    void Start()
+    private void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _boxCollider = GetComponent<BoxCollider>();
@@ -75,6 +75,12 @@ public class DiceRoll : MonoBehaviour
         }
     }
 
+    public void HideAndImmobilize()
+    {
+        _renderer.enabled = false;
+        _rigidbody.useGravity = false;
+    }
+
     private void RaycastForResults()
     {
         _raysFromFaces[0] = new Tuple<DiceFace, Ray>(DiceFace.One, new Ray(transform.position, transform.right));
@@ -89,10 +95,8 @@ public class DiceRoll : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(_raysFromFaces[i].Item2, out hit, 10))
             {
-                Debug.Log(hit.transform.name);
                 if (hit.transform.name == "TableTop")
                 {
-                    Debug.Log($"You`ve got {_raysFromFaces[i].Item1}");
                     rollResult = _raysFromFaces[i].Item1;
                     if (resultReadyEvent != null) resultReadyEvent(this, null);
                 }
