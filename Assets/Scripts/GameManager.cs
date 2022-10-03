@@ -183,6 +183,6 @@ public class GameManager : Singleton<GameManager>
 
         _computerPlayer.ThrowDices();
         diceZoomInCamera.Priority = 11;
-        StartCoroutine(ChangeState(GameState.Reroll, false, 3f));
+        StartCoroutine(ChangeState(GameState.Reroll, false, 5f));
     }
 }

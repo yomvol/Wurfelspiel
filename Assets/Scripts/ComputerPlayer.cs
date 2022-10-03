@@ -10,20 +10,39 @@ public class ComputerPlayer : BasePlayer
         Initialize();
     }
 
+    protected override void ResultReadyAllDicesEventHandler(object sender, EventArgs e)
+    {
+        _resultsReceivedCounter++;
+
+        if (_resultsReceivedCounter >= NUMBER_OF_DICES)
+        {
+            for (int i = 0; i < NUMBER_OF_DICES; i++)
+            {
+                hand.mask[i] = _rolls[i].rollResult;
+                _rolls[i].resultReadyEvent -= ResultReadyAllDicesEventHandler;
+            }
+            _resultsReceivedCounter = 0;
+            EvaluateHand();
+            Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
+        }
+    }
+
     public override void SelectAndReroll()
     {
-        Debug.Log("Here");
         if (_dicesToReroll.Count > 0)
         {
-            Debug.Log("There");
             GameManager.Instance.diceZoomInCamera.Priority = 11;
             for (int i = 0; i < _dicesToReroll.Count; i++)
             {
                 _dicesToReroll[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
+                _dicesToReroll[i].resultReadyEvent += ResultReadyRerollDicesEventHandler;
                 _dicesToReroll[i].ThrowDice();
             }
-           
-            // Evaluate hand again
+        }
+        else
+        {
+            EvaluateHand();
+            Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
         }
 
         StartCoroutine(GameManager.Instance.ChangeState(GameState.Win, 3f));
@@ -31,10 +50,11 @@ public class ComputerPlayer : BasePlayer
 
     protected override void EvaluateHand()
     {
-        Array.Sort(hand.mask);
+        DiceFace[] maskClone = (DiceFace[])hand.mask.Clone();
+        Array.Sort(maskClone);
 
         // Are there 3 or more dice of the same value?
-        var groups = hand.mask.GroupBy(v => v);
+        var groups = maskClone.GroupBy(v => v);
         DictionaryEntry dominantGroup = new DictionaryEntry();
         dominantGroup.Value = 0;
         foreach (var group in groups)
@@ -108,13 +128,13 @@ public class ComputerPlayer : BasePlayer
                 DiceFace[] fiveHighStraight = { DiceFace.One, DiceFace.Two, DiceFace.Three, DiceFace.Four, DiceFace.Five };
                 DiceFace[] sixHighStraight = { DiceFace.Two, DiceFace.Three, DiceFace.Four, DiceFace.Five, DiceFace.Six };
 
-                if (hand.mask.SequenceEqual(fiveHighStraight))
+                if (maskClone.SequenceEqual(fiveHighStraight))
                 {
                     hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
                         (HandCombination.FiveHighStraight, DiceFace.One, DiceFace.One);
                     return;
                 }
-                else if (hand.mask.SequenceEqual(sixHighStraight))
+                else if (maskClone.SequenceEqual(sixHighStraight))
                 {
                     hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
                         (HandCombination.SixHighStraight, DiceFace.One, DiceFace.One);

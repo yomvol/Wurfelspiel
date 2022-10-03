@@ -30,7 +30,7 @@ public class HumanPlayer : BasePlayer
         Initialize();
     }
 
-    protected override void ResultReadyEventHandler(object sender, EventArgs e)
+    protected override void ResultReadyAllDicesEventHandler(object sender, EventArgs e)
     {
         _resultsReceivedCounter++;
 
@@ -39,11 +39,9 @@ public class HumanPlayer : BasePlayer
             for (int i = 0; i < NUMBER_OF_DICES; i++)
             {
                 hand.mask[i] = _rolls[i].rollResult;
-                _rolls[i].resultReadyEvent -= ResultReadyEventHandler;
+                _rolls[i].resultReadyEvent -= ResultReadyAllDicesEventHandler;
             }
             _resultsReceivedCounter = 0;
-            EvaluateHand();
-            Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
             StartCoroutine(GameManager.Instance.ChangeState(GameState.Reroll, true));
         }
     }
@@ -125,10 +123,14 @@ public class HumanPlayer : BasePlayer
                     renderer.color = Color.white;
                     renderer.enabled = false;
                     _dicesToReroll[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
+                    _dicesToReroll[i].resultReadyEvent += ResultReadyRerollDicesEventHandler;
                     _dicesToReroll[i].ThrowDice();
                 }
-
-                // Evaluate hand again
+            }
+            else
+            {
+                EvaluateHand();
+                Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
             }
             
             StartCoroutine(GameManager.Instance.ChangeState(GameState.OpponentTurn, 3f));

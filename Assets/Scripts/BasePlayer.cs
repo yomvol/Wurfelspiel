@@ -47,26 +47,26 @@ public abstract class BasePlayer : MonoBehaviour
         }
     }
 
-    protected virtual void ResultReadyAllDicesEventHandler(object sender, EventArgs e)
+    protected abstract void ResultReadyAllDicesEventHandler(object sender, EventArgs e);
+
+    protected void ResultReadyRerollDicesEventHandler(object sender, EventArgs e)
     {
         _resultsReceivedCounter++;
 
-        if (_resultsReceivedCounter >= NUMBER_OF_DICES)
+        // count = 0 case is handled externally
+        if (_resultsReceivedCounter >= _dicesToReroll.Count)
         {
-            for (int i = 0; i < NUMBER_OF_DICES; i++)
+            for (int i = 0; i < _dicesToReroll.Count; i++)
             {
-                hand.mask[i] = _rolls[i].rollResult;
-                _rolls[i].resultReadyEvent -= ResultReadyEventHandler;
+                int index = Array.IndexOf(_rolls, _dicesToReroll[i]);
+                hand.mask[index] = _dicesToReroll[i].rollResult;
+                _dicesToReroll[i].resultReadyEvent -= ResultReadyRerollDicesEventHandler;
             }
+
             _resultsReceivedCounter = 0;
             EvaluateHand();
             Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
         }
-    }
-
-    protected void ResultReadyRerollDicesEventHandler(object sender, EventArgs e)
-    {
-
     }
 
     public virtual void ThrowDices()
