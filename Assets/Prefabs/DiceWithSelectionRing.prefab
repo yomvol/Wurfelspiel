@@ -65,7 +65,17 @@ PrefabInstance:
     - target: {fileID: 3098821314354706268, guid: a133597c12d5fb74a98181c759b315de,
         type: 3}
       propertyPath: m_Name
-      value: Dice 1 1
+      value: DiceWithSelectionRing
+      objectReference: {fileID: 0}
+    - target: {fileID: 6422618003193234068, guid: a133597c12d5fb74a98181c759b315de,
+        type: 3}
+      propertyPath: angularVelocity
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6422618003193234068, guid: a133597c12d5fb74a98181c759b315de,
+        type: 3}
+      propertyPath: impulseStrength
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a133597c12d5fb74a98181c759b315de, type: 3}
