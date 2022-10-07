@@ -23,7 +23,8 @@ public class ComputerPlayer : BasePlayer
             }
             _resultsReceivedCounter = 0;
             EvaluateHand();
-            Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
+            GameManager.Instance.diceZoomInCamera.Priority = 11;
+            StartCoroutine(GameManager.Instance.ChangeState(GameState.Reroll, false, 3f));
         }
     }
 
@@ -31,7 +32,6 @@ public class ComputerPlayer : BasePlayer
     {
         if (_dicesToReroll.Count > 0)
         {
-            GameManager.Instance.diceZoomInCamera.Priority = 11;
             for (int i = 0; i < _dicesToReroll.Count; i++)
             {
                 _dicesToReroll[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
@@ -45,7 +45,7 @@ public class ComputerPlayer : BasePlayer
             Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
         }
 
-        StartCoroutine(GameManager.Instance.ChangeState(GameState.Win, 3f));
+        StartCoroutine(GameManager.Instance.ChangeState(GameState.HandsComparing, 3f));
     }
 
     protected override void EvaluateHand()

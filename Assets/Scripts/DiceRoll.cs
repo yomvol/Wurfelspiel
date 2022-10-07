@@ -6,8 +6,7 @@ public class DiceRoll : MonoBehaviour
 {
     public float impulseStrength; // module of the force vector
     public float angularVelocity;
-    [HideInInspector]
-    public DiceFace rollResult;
+    public DiceFace rollResult { get; private set; }
     public event EventHandler resultReadyEvent;
 
     private Tuple<DiceFace, Ray>[] _raysFromFaces;
@@ -35,25 +34,19 @@ public class DiceRoll : MonoBehaviour
         impulse.x = MathF.Cos(angleOfImpulse) * impulseStrength;
         impulse.z = MathF.Sin(angleOfImpulse) * impulseStrength;
         Vector3 angularMomentum = Vector3.zero;
-        int torqueDirection = Random.Range(0, 6);
+        int torqueDirection = Random.Range(0, 4);
         switch (torqueDirection)
         {
             case 0:
-                angularMomentum = Vector3.up;
-                break;
-            case 1:
-                angularMomentum = Vector3.down;
-                break;
-            case 2:
                 angularMomentum = Vector3.left;
                 break;
-            case 3:
+            case 1:
                 angularMomentum = Vector3.right;
                 break;
-            case 4:
+            case 2:
                 angularMomentum = Vector3.forward;
                 break;
-            case 5:
+            case 3:
                 angularMomentum = Vector3.back;
                 break;
             default:
@@ -73,12 +66,6 @@ public class DiceRoll : MonoBehaviour
         {
             Invoke("RaycastForResults", 1);
         }
-    }
-
-    public void HideAndImmobilize()
-    {
-        _renderer.enabled = false;
-        _rigidbody.useGravity = false;
     }
 
     private void RaycastForResults()

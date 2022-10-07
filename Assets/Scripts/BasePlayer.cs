@@ -73,17 +73,29 @@ public abstract class BasePlayer : MonoBehaviour
     {
         for (int i = 0; i < NUMBER_OF_DICES; i++)
         {
+            hand.dices[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
             _rolls[i].resultReadyEvent += ResultReadyAllDicesEventHandler;
             _rolls[i].ThrowDice();
         }
     }
 
-    public void ResetDicePositionsAndHide()
+    public void KeepDicesNearby(bool isCalledByHuman)
     {
-        for (int i = 0; i < NUMBER_OF_DICES; i++)
+        if (isCalledByHuman)
         {
-            _rolls[i].HideAndImmobilize();
-            hand.dices[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
+            hand.dices[0].transform.position = new Vector3(1.873f, 4.176f, -1.383f);
+            hand.dices[1].transform.position = new Vector3(2.034f, 4.176f, -1.084f);
+            hand.dices[2].transform.position = new Vector3(1.916f, 4.176f, -0.813f);
+            hand.dices[3].transform.position = new Vector3(2.286f, 4.176f, -0.964f);
+            hand.dices[4].transform.position = new Vector3(2.161f, 4.176f, -1.456f);
+        }
+        else
+        {
+            hand.dices[0].transform.position = new Vector3(-2.056f, 4.176f, 1.736f);
+            hand.dices[1].transform.position = new Vector3(-1.806f, 4.176f, 1.601f);
+            hand.dices[2].transform.position = new Vector3(-1.929f, 4.176f, 1.372f);
+            hand.dices[3].transform.position = new Vector3(-2.179f, 4.176f, 1.264f);
+            hand.dices[4].transform.position = new Vector3(-2.235f, 4.176f, 1.509f);
         }
     }
 

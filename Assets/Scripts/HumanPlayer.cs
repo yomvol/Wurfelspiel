@@ -7,8 +7,11 @@ public class HumanPlayer : BasePlayer
     private SpriteRenderer[] _selectionRingRenderers;
     private Color32 _selectedCol;
     private Color32 _selectedAndCursorHoveringCol;
+    private int _holdSurrenderCounter = 0;
     
     public int CurrentHighlightedDice;
+    [HideInInspector]
+    public bool isWaitingToRoll;
     [HideInInspector]
     public bool isRerolling;
 
@@ -115,7 +118,6 @@ public class HumanPlayer : BasePlayer
             currentRenderer.enabled = false;
             if (_dicesToReroll.Count > 0)
             {
-                GameManager.Instance.diceZoomInCamera.Priority = 11;
                 SpriteRenderer renderer;
                 for (int i = 0; i < _dicesToReroll.Count; i++)
                 {
@@ -139,6 +141,23 @@ public class HumanPlayer : BasePlayer
 
     private void Update()
     {
+        if (Keyboard.current.lKey.isPressed)
+        {
+            _holdSurrenderCounter++;
+            // TODO add some kind of indicator of button holding
+            if (_holdSurrenderCounter > 120)
+            {
+                Debug.Log("You have surrendered.");
+                StartCoroutine(GameManager.Instance.ChangeState(GameState.Lose));
+            }
+        }
+
+        if (isWaitingToRoll && Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            isWaitingToRoll = false;
+            ThrowDices();
+        }
+
         if (isRerolling)
         {
             SelectAndReroll();
