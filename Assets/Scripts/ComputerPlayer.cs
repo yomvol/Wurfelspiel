@@ -23,6 +23,8 @@ public class ComputerPlayer : BasePlayer
             }
             _resultsReceivedCounter = 0;
             EvaluateHand();
+            GameManager.Instance.diceZoomInCamera.Priority = 11;
+            StartCoroutine(GameManager.Instance.ChangeState(GameState.Reroll, false, 3f));
         }
     }
 
@@ -43,7 +45,7 @@ public class ComputerPlayer : BasePlayer
             Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
         }
 
-        StartCoroutine(GameManager.Instance.ChangeState(GameState.HandsEvaluation, 3f));
+        StartCoroutine(GameManager.Instance.ChangeState(GameState.HandsComparing, 3f));
     }
 
     protected override void EvaluateHand()

@@ -11,6 +11,8 @@ public class HumanPlayer : BasePlayer
     
     public int CurrentHighlightedDice;
     [HideInInspector]
+    public bool isWaitingToRoll;
+    [HideInInspector]
     public bool isRerolling;
 
     protected override void Initialize()
@@ -148,6 +150,12 @@ public class HumanPlayer : BasePlayer
                 Debug.Log("You have surrendered.");
                 StartCoroutine(GameManager.Instance.ChangeState(GameState.Lose));
             }
+        }
+
+        if (isWaitingToRoll && Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            isWaitingToRoll = false;
+            ThrowDices();
         }
 
         if (isRerolling)

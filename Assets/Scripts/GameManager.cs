@@ -10,7 +10,7 @@ public enum GameState
     PlayerTurn,
     OpponentTurn,
     Reroll,
-    HandsEvaluation,
+    HandsComparing,
     Win,
     Lose
 }
@@ -60,8 +60,8 @@ public class GameManager : Singleton<GameManager>
             case GameState.OpponentTurn:
                 HandleOpponentTurn();
                 break;
-            case GameState.HandsEvaluation:
-                HandleHandsEvaluation();
+            case GameState.HandsComparing:
+                HandleHandsComparing();
                 break;
             case GameState.Win:
                 break;
@@ -96,6 +96,9 @@ public class GameManager : Singleton<GameManager>
                 break;
             case GameState.OpponentTurn:
                 HandleOpponentTurn();
+                break;
+            case GameState.HandsComparing:
+                HandleHandsComparing();
                 break;
             case GameState.Win:
                 break;
@@ -150,7 +153,7 @@ public class GameManager : Singleton<GameManager>
             diceTargetGroup.AddMember(transform, 1, 0);
         }
 
-        _humanPlayer.ThrowDices();
+        _humanPlayer.isWaitingToRoll = true;
     }
 
     private void HandleReroll(bool isHumanPlayerRerolling)
@@ -184,10 +187,9 @@ public class GameManager : Singleton<GameManager>
         }
 
         _computerPlayer.ThrowDices();
-        StartCoroutine(ChangeState(GameState.Reroll, false));
     }
 
-    private void HandleHandsEvaluation()
+    private void HandleHandsComparing()
     {
         diceZoomInCamera.Priority = 5;
         var humanHandPower = _humanPlayer.hand.handPower;
