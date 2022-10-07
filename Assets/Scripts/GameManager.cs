@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.UI;
+using TMPro;
 
 [Serializable]
 public enum GameState
@@ -23,6 +25,11 @@ public class GameManager : Singleton<GameManager>
     public GameState State { get; private set; }
     public CinemachineVirtualCamera diceZoomInCamera;
     public CinemachineTargetGroup diceTargetGroup;
+    public TextMeshProUGUI opponentHandCombinationName;
+    public Image[] opponentDiceIcons;
+    public Image[] playerDiceIcons;
+    public Sprite[] whiteDiceSprites;
+    public Sprite[] redDiceSprites;
 
     [SerializeField]
     private GameObject _player;

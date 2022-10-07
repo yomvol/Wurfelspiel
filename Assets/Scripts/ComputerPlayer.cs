@@ -23,6 +23,33 @@ public class ComputerPlayer : BasePlayer
             }
             _resultsReceivedCounter = 0;
             EvaluateHand();
+            DiceFace[] maskSorted = (DiceFace[])hand.mask.Clone();
+            Array.Sort(maskSorted);
+            for (int i = 0; i < NUMBER_OF_DICES; i++)
+            {
+                switch (maskSorted[i])
+                {
+                    case DiceFace.One:
+                        GameManager.Instance.opponentDiceIcons[i].sprite = GameManager.Instance.redDiceSprites[0];
+                        break;
+                    case DiceFace.Two:
+                        GameManager.Instance.opponentDiceIcons[i].sprite = GameManager.Instance.redDiceSprites[1];
+                        break;
+                    case DiceFace.Three:
+                        GameManager.Instance.opponentDiceIcons[i].sprite = GameManager.Instance.redDiceSprites[2];
+                        break;
+                    case DiceFace.Four:
+                        GameManager.Instance.opponentDiceIcons[i].sprite = GameManager.Instance.redDiceSprites[3];
+                        break;
+                    case DiceFace.Five:
+                        GameManager.Instance.opponentDiceIcons[i].sprite = GameManager.Instance.redDiceSprites[4];
+                        break;
+                    case DiceFace.Six:
+                        GameManager.Instance.opponentDiceIcons[i].sprite = GameManager.Instance.redDiceSprites[5];
+                        break;
+                }
+            }
+            GameManager.Instance.opponentHandCombinationName.text = hand.handPower.Item1.ToString();
             GameManager.Instance.diceZoomInCamera.Priority = 11;
             StartCoroutine(GameManager.Instance.ChangeState(GameState.Reroll, false, 3f));
         }
