@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 6422618003193234068}
   m_Layer: 0
   m_Name: Dice
-  m_TagString: Untagged
+  m_TagString: Dice
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -128,9 +128,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 360f43b70c4bc0945b0b66763356c856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  impulseStrength: 1
-  angularVelocity: 0.1
-  rollResult: 0
+  ImpulseStrength: 1
+  AngularVelocity: 0.1
 --- !u!1 &8294378483342963543
 GameObject:
   m_ObjectHideFlags: 0

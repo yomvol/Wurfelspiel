@@ -8,12 +8,10 @@ public class HumanPlayer : BasePlayer
     private Color32 _selectedCol;
     private Color32 _selectedAndCursorHoveringCol;
     private int _holdSurrenderCounter = 0;
-    
-    public int CurrentHighlightedDice;
-    [HideInInspector]
-    public bool isWaitingToRoll;
-    [HideInInspector]
-    public bool isRerolling;
+
+    [HideInInspector] public int CurrentHighlightedDice;
+    [HideInInspector] public bool IsWaitingToRoll;
+    [HideInInspector] public bool IsRerolling;
 
     protected override void Initialize()
     {
@@ -24,7 +22,7 @@ public class HumanPlayer : BasePlayer
 
         for (int i = 0; i < NUMBER_OF_DICES; i++)
         {
-            _selectionRingRenderers[i] = hand.dices[i].GetComponentInChildren<SpriteRenderer>();
+            _selectionRingRenderers[i] = Hand.Dices[i].GetComponentInChildren<SpriteRenderer>();
         }
     }
 
@@ -41,12 +39,44 @@ public class HumanPlayer : BasePlayer
         {
             for (int i = 0; i < NUMBER_OF_DICES; i++)
             {
-                hand.mask[i] = _rolls[i].rollResult;
-                _rolls[i].resultReadyEvent -= ResultReadyAllDicesEventHandler;
+                Hand.Mask[i] = _rolls[i].RollResult;
+                _rolls[i].ResultReadyEvent -= ResultReadyAllDicesEventHandler;
             }
             _resultsReceivedCounter = 0;
+            EvaluateHand();
+            UpdateUI((DiceFace[])Hand.Mask.Clone());
             StartCoroutine(GameManager.Instance.ChangeState(GameState.Reroll, true));
         }
+    }
+
+    protected override void UpdateUI(DiceFace[] arr)
+    {
+        Array.Sort(arr);
+        for (int i = 0; i < NUMBER_OF_DICES; i++)
+        {
+            switch (arr[i])
+            {
+                case DiceFace.One:
+                    CanvasManager.Instance.PlayerDiceIcons[i].sprite = CanvasManager.Instance.WhiteDiceSprites[0];
+                    break;
+                case DiceFace.Two:
+                    CanvasManager.Instance.PlayerDiceIcons[i].sprite = CanvasManager.Instance.WhiteDiceSprites[1];
+                    break;
+                case DiceFace.Three:
+                    CanvasManager.Instance.PlayerDiceIcons[i].sprite = CanvasManager.Instance.WhiteDiceSprites[2];
+                    break;
+                case DiceFace.Four:
+                    CanvasManager.Instance.PlayerDiceIcons[i].sprite = CanvasManager.Instance.WhiteDiceSprites[3];
+                    break;
+                case DiceFace.Five:
+                    CanvasManager.Instance.PlayerDiceIcons[i].sprite = CanvasManager.Instance.WhiteDiceSprites[4];
+                    break;
+                case DiceFace.Six:
+                    CanvasManager.Instance.PlayerDiceIcons[i].sprite = CanvasManager.Instance.WhiteDiceSprites[5];
+                    break;
+            }
+        }
+        CanvasManager.Instance.PlayerHandCombinationName.text = Hand.HandPower.Item1.ToString();
     }
 
     public override void SelectAndReroll()
@@ -114,7 +144,7 @@ public class HumanPlayer : BasePlayer
         }
         else if (Keyboard.current.fKey.wasPressedThisFrame)
         {
-            isRerolling = false;
+            IsRerolling = false;
             currentRenderer.enabled = false;
             if (_dicesToReroll.Count > 0)
             {
@@ -125,17 +155,16 @@ public class HumanPlayer : BasePlayer
                     renderer.color = Color.white;
                     renderer.enabled = false;
                     _dicesToReroll[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
-                    _dicesToReroll[i].resultReadyEvent += ResultReadyRerollDicesEventHandler;
+                    _dicesToReroll[i].ResultReadyEvent += ResultReadyRerollDicesEventHandler;
                     _dicesToReroll[i].ThrowDice();
                 }
             }
             else
             {
-                EvaluateHand();
-                Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
+                Debug.Log($"{gameObject.name} got {Hand.HandPower.Item1} of {Hand.HandPower.Item2}");
             }
             
-            StartCoroutine(GameManager.Instance.ChangeState(GameState.OpponentTurn, 3f));
+            StartCoroutine(GameManager.Instance.ChangeState(GameState.OpponentTurn, 4f));
         }
     }
 
@@ -144,23 +173,33 @@ public class HumanPlayer : BasePlayer
         if (Keyboard.current.lKey.isPressed)
         {
             _holdSurrenderCounter++;
-            // TODO add some kind of indicator of button holding
+            // TODO add some kind of indicator of button holding, make it depend on time
             if (_holdSurrenderCounter > 120)
             {
                 Debug.Log("You have surrendered.");
                 StartCoroutine(GameManager.Instance.ChangeState(GameState.Lose));
+                return;
             }
         }
 
-        if (isWaitingToRoll && Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (IsWaitingToRoll && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            isWaitingToRoll = false;
+            IsWaitingToRoll = false;
             ThrowDices();
         }
 
-        if (isRerolling)
+        if (IsRerolling)
         {
             SelectAndReroll();
         }
+    }
+
+    public override void KeepDicesNearby()
+    {
+        Hand.Dices[0].transform.position = new Vector3(1.873f, 4.176f, -1.383f);
+        Hand.Dices[1].transform.position = new Vector3(2.034f, 4.176f, -1.084f);
+        Hand.Dices[2].transform.position = new Vector3(1.916f, 4.176f, -0.813f);
+        Hand.Dices[3].transform.position = new Vector3(2.286f, 4.176f, -0.964f);
+        Hand.Dices[4].transform.position = new Vector3(2.161f, 4.176f, -1.456f);
     }
 }
