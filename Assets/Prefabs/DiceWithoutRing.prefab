@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 7863293072374293630}
   m_Layer: 0
   m_Name: DiceWithoutRing
-  m_TagString: Untagged
+  m_TagString: Dice
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ac3bdd36fd6fd5946993dd5c6d28a3fe, type: 2}
+  - {fileID: 2100000, guid: afae1ce53af96e946b1bc66559612768, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -127,6 +127,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 360f43b70c4bc0945b0b66763356c856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  impulseStrength: 1
-  angularVelocity: 0.1
-  rollResult: 0
+  ImpulseStrength: 1
+  AngularVelocity: 0.1

@@ -18,14 +18,49 @@ public class ComputerPlayer : BasePlayer
         {
             for (int i = 0; i < NUMBER_OF_DICES; i++)
             {
-                hand.mask[i] = _rolls[i].rollResult;
-                _rolls[i].resultReadyEvent -= ResultReadyAllDicesEventHandler;
+                Hand.Mask[i] = _rolls[i].RollResult;
+                _rolls[i].ResultReadyEvent -= ResultReadyAllDicesEventHandler;
             }
             _resultsReceivedCounter = 0;
             EvaluateHand();
-            GameManager.Instance.diceZoomInCamera.Priority = 11;
-            StartCoroutine(GameManager.Instance.ChangeState(GameState.Reroll, false, 3f));
+            if (GameManager.Instance.State == GameState.OpponentTurn)
+            {
+                UpdateUI((DiceFace[])Hand.Mask.Clone());
+            }
+
+            GameManager.Instance.DiceZoomInCamera.Priority = 11;
+            StartCoroutine(GameManager.Instance.ChangeState(GameState.Reroll, false, 4f));
         }
+    }
+
+    protected override void UpdateUI(DiceFace[] arr)
+    {
+        Array.Sort(arr);
+        for (int i = 0; i < NUMBER_OF_DICES; i++)
+        {
+            switch (arr[i])
+            {
+                case DiceFace.One:
+                    CanvasManager.Instance.OpponentDiceIcons[i].sprite = CanvasManager.Instance.RedDiceSprites[0];
+                    break;
+                case DiceFace.Two:
+                    CanvasManager.Instance.OpponentDiceIcons[i].sprite = CanvasManager.Instance.RedDiceSprites[1];
+                    break;
+                case DiceFace.Three:
+                    CanvasManager.Instance.OpponentDiceIcons[i].sprite = CanvasManager.Instance.RedDiceSprites[2];
+                    break;
+                case DiceFace.Four:
+                    CanvasManager.Instance.OpponentDiceIcons[i].sprite = CanvasManager.Instance.RedDiceSprites[3];
+                    break;
+                case DiceFace.Five:
+                    CanvasManager.Instance.OpponentDiceIcons[i].sprite = CanvasManager.Instance.RedDiceSprites[4];
+                    break;
+                case DiceFace.Six:
+                    CanvasManager.Instance.OpponentDiceIcons[i].sprite = CanvasManager.Instance.RedDiceSprites[5];
+                    break;
+            }
+        }
+        CanvasManager.Instance.OpponentHandCombinationName.text = Hand.HandPower.Item1.ToString();
     }
 
     public override void SelectAndReroll()
@@ -35,22 +70,36 @@ public class ComputerPlayer : BasePlayer
             for (int i = 0; i < _dicesToReroll.Count; i++)
             {
                 _dicesToReroll[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
-                _dicesToReroll[i].resultReadyEvent += ResultReadyRerollDicesEventHandler;
+                _dicesToReroll[i].ResultReadyEvent += ResultReadyRerollDicesEventHandler;
                 _dicesToReroll[i].ThrowDice();
             }
         }
         else
         {
-            EvaluateHand();
-            Debug.Log($"{gameObject.name} got {hand.handPower.Item1} of {hand.handPower.Item2}");
+            // There are no dices to reroll, so hand and UI are unchanged
+            //EvaluateHand();
+            //UpdateUI((DiceFace[])Hand.Mask.Clone());
+            Debug.Log($"{gameObject.name} got {Hand.HandPower.Item1} of {Hand.HandPower.Item2}");
         }
 
-        StartCoroutine(GameManager.Instance.ChangeState(GameState.HandsComparing, 3f));
+        StartCoroutine(GameManager.Instance.ChangeState(GameState.HandsComparing, 6f));
+    }
+
+    public override void KeepDicesNearby()
+    {
+        // Are hard coded values a temporary solution?
+
+        Hand.Dices[0].transform.position = new Vector3(-2.056f, 4.176f, 1.736f);
+        Hand.Dices[1].transform.position = new Vector3(-1.806f, 4.176f, 1.601f);
+        Hand.Dices[2].transform.position = new Vector3(-1.929f, 4.176f, 1.372f);
+        Hand.Dices[3].transform.position = new Vector3(-2.179f, 4.176f, 1.264f);
+        Hand.Dices[4].transform.position = new Vector3(-2.235f, 4.176f, 1.509f);
     }
 
     protected override void EvaluateHand()
     {
-        DiceFace[] maskClone = (DiceFace[])hand.mask.Clone();
+        _dicesToReroll.Clear();
+        DiceFace[] maskClone = (DiceFace[])Hand.Mask.Clone();
         Array.Sort(maskClone);
 
         // Are there 3 or more dice of the same value?
@@ -71,19 +120,19 @@ public class ComputerPlayer : BasePlayer
         {
             if (numberOfDicesOfTheSameValue == 5)
             {
-                hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
+                Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
                     (HandCombination.FiveOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
                 return;
             }
             else if (numberOfDicesOfTheSameValue == 4)
             {
-                hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
+                Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
                     (HandCombination.FourOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
                 foreach (var group in groups)
                 {
                     if (group.Count() == 1)
                     {
-                        int index = Array.IndexOf(hand.mask, group.Key);
+                        int index = Array.IndexOf(Hand.Mask, group.Key);
                         _dicesToReroll.Add(_rolls[index]);
                         break;
                     }
@@ -98,7 +147,7 @@ public class ComputerPlayer : BasePlayer
                     {
                         if (group.Key != (DiceFace)dominantGroup.Key)
                         {
-                            hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
+                            Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
                     (HandCombination.FullHouse, (DiceFace)dominantGroup.Key, group.Key);
                             return;
                         }
@@ -106,13 +155,13 @@ public class ComputerPlayer : BasePlayer
                 }
                 else // we have enough info to conclude that the hand is Three of a kind
                 {
-                    hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
+                    Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
                     (HandCombination.ThreeOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
-                    foreach (var diceFace in hand.mask)
+                    foreach (var diceFace in Hand.Mask)
                     {
                         if (diceFace != (DiceFace)dominantGroup.Key)
                         {
-                            int index = Array.IndexOf(hand.mask, diceFace);
+                            int index = Array.IndexOf(Hand.Mask, diceFace);
                             _dicesToReroll.Add(_rolls[index]);
                         }
                     }
@@ -130,19 +179,19 @@ public class ComputerPlayer : BasePlayer
 
                 if (maskClone.SequenceEqual(fiveHighStraight))
                 {
-                    hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
+                    Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
                         (HandCombination.FiveHighStraight, DiceFace.One, DiceFace.One);
                     return;
                 }
                 else if (maskClone.SequenceEqual(sixHighStraight))
                 {
-                    hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
+                    Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
                         (HandCombination.SixHighStraight, DiceFace.One, DiceFace.One);
                     return;
                 }
                 else // high card
                 {
-                    hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
+                    Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
                         (HandCombination.HighCard, DiceFace.One, DiceFace.One);
                     _dicesToReroll.AddRange(_rolls);
                     return;
@@ -161,12 +210,12 @@ public class ComputerPlayer : BasePlayer
                         }
                         else if (group.Count() == 1)
                         {
-                            int index = Array.IndexOf(hand.mask, group.Key);
+                            int index = Array.IndexOf(Hand.Mask, group.Key);
                             _dicesToReroll.Add(_rolls[index]);
                         }
                     }
                     kickers.Sort();
-                    hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
+                    Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
                         (HandCombination.TwoPairs, (DiceFace)kickers[1], (DiceFace)kickers[0]);
                     return;
                 }
@@ -176,13 +225,13 @@ public class ComputerPlayer : BasePlayer
                     {
                         if (group.Count() == 2)
                         {
-                            hand.handPower = new Tuple<HandCombination, DiceFace, DiceFace>
+                            Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
                         (HandCombination.Pair, group.Key, DiceFace.One);
-                            foreach (var diceFace in hand.mask)
+                            foreach (var diceFace in Hand.Mask)
                             {
                                 if (diceFace == group.Key)
                                     continue;
-                                int index = Array.IndexOf(hand.mask, diceFace);
+                                int index = Array.IndexOf(Hand.Mask, diceFace);
                                 _dicesToReroll.Add(_rolls[index]);
                             }
                             return;

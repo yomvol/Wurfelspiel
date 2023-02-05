@@ -4,17 +4,17 @@ using Random = UnityEngine.Random;
 
 public class DiceRoll : MonoBehaviour
 {
-    public float impulseStrength; // module of the force vector
-    public float angularVelocity;
-    public DiceFace rollResult { get; private set; }
-    public event EventHandler resultReadyEvent;
+    public float ImpulseStrength = 1; // module of the force vector
+    public float AngularVelocity = 0.1f;
+    public DiceFace RollResult { get; private set; }
+    public event EventHandler ResultReadyEvent;
 
     private Tuple<DiceFace, Ray>[] _raysFromFaces;
     private Rigidbody _rigidbody;
     private BoxCollider _boxCollider;
     private MeshRenderer _renderer;
 
-    private void Start()
+    private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _boxCollider = GetComponent<BoxCollider>();
@@ -22,7 +22,7 @@ public class DiceRoll : MonoBehaviour
         _renderer.enabled = false;
         _raysFromFaces = new Tuple<DiceFace, Ray>[6];
         _rigidbody.useGravity = false;
-        rollResult = DiceFace.One;
+        RollResult = DiceFace.One;
     }
 
     public void ThrowDice()
@@ -31,8 +31,8 @@ public class DiceRoll : MonoBehaviour
         Vector3 impulse = new Vector3();
         impulse.y = 0;
         float angleOfImpulse = Random.Range(0.01f, 2 * MathF.PI);
-        impulse.x = MathF.Cos(angleOfImpulse) * impulseStrength;
-        impulse.z = MathF.Sin(angleOfImpulse) * impulseStrength;
+        impulse.x = MathF.Cos(angleOfImpulse) * ImpulseStrength;
+        impulse.z = MathF.Sin(angleOfImpulse) * ImpulseStrength;
         Vector3 angularMomentum = Vector3.zero;
         int torqueDirection = Random.Range(0, 4);
         switch (torqueDirection)
@@ -54,17 +54,20 @@ public class DiceRoll : MonoBehaviour
                 break;
         }
 
-        angularMomentum *= angularVelocity * _rigidbody.mass * Mathf.Pow(_boxCollider.size.x, 2.0f);
+        angularMomentum *= AngularVelocity * _rigidbody.mass * Mathf.Pow(_boxCollider.size.x, 2.0f);
+        //Debug.DrawLine(transform.position, impulse, Color.red);
+        //Debug.DrawLine(transform.position, angularMomentum, Color.green);
+        //Debug.Log(gameObject.name + " Impulse: " + impulse.ToString() + " Ang Momentum: " + angularMomentum.ToString());
         _rigidbody.useGravity = true;
         _rigidbody.AddForce(impulse, ForceMode.Impulse);
-        _rigidbody.AddTorque(angularMomentum, ForceMode.Impulse);
+        _rigidbody.AddRelativeTorque(angularMomentum, ForceMode.Impulse);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.name == "TableTop")
         {
-            Invoke("RaycastForResults", 1);
+            Invoke("RaycastForResults", 2);
         }
     }
 
@@ -84,11 +87,10 @@ public class DiceRoll : MonoBehaviour
             {
                 if (hit.transform.name == "TableTop")
                 {
-                    rollResult = _raysFromFaces[i].Item1;
-                    if (resultReadyEvent != null) resultReadyEvent(this, null);
+                    RollResult = _raysFromFaces[i].Item1;
+                    if (ResultReadyEvent != null) ResultReadyEvent(this, null);
                 }
             }
-            _raysFromFaces[i] = null;
         }
     }
 }

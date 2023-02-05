@@ -12,7 +12,7 @@ public enum GameState
     Reroll,
     HandsComparing,
     Win,
-    Lose
+    Defeat
 }
 
 public class GameManager : Singleton<GameManager>
@@ -21,14 +21,12 @@ public class GameManager : Singleton<GameManager>
     public static event Action<GameState> OnAfterStateChanged;
 
     public GameState State { get; private set; }
-    public CinemachineVirtualCamera diceZoomInCamera;
-    public CinemachineTargetGroup diceTargetGroup;
+    public CinemachineVirtualCamera DiceZoomInCamera;
+    public CinemachineTargetGroup DiceTargetGroup;
 
-    [SerializeField]
-    private GameObject _player;
+    [SerializeField] private GameObject _player;
+    [SerializeField] private GameObject _computerEnemy;
     private HumanPlayer _humanPlayer;
-    [SerializeField]
-    private GameObject _computerEnemy;
     private ComputerPlayer _computerPlayer;
     private Transform[] _humanPlayerDiceTransforms;
     private Transform[] _computerPlayerDiceTransforms;
@@ -64,8 +62,10 @@ public class GameManager : Singleton<GameManager>
                 HandleHandsComparing();
                 break;
             case GameState.Win:
+                HandleWin();
                 break;
-            case GameState.Lose:
+            case GameState.Defeat:
+                HandleDefeat();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
@@ -101,15 +101,16 @@ public class GameManager : Singleton<GameManager>
                 HandleHandsComparing();
                 break;
             case GameState.Win:
+                HandleWin();
                 break;
-            case GameState.Lose:
+            case GameState.Defeat:
+                HandleDefeat();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
         }
 
         OnAfterStateChanged?.Invoke(newState);
-
         Debug.Log($"New state: {newState}");
     }
 
@@ -123,48 +124,55 @@ public class GameManager : Singleton<GameManager>
         _humanPlayerDiceTransforms = new Transform[BasePlayer.NUMBER_OF_DICES];
         _computerPlayerDiceTransforms = new Transform[BasePlayer.NUMBER_OF_DICES];
 
-        _humanPlayerDiceTransforms[0] = humanDiceTransforms[1];
-        for (int i = 3; i < humanDiceTransforms.Length;)
+        int i = 0;
+        foreach (var transf in humanDiceTransforms)
         {
-            _humanPlayerDiceTransforms[i / 2] = humanDiceTransforms[i];
-            i += 2;
+            if (transf.gameObject.CompareTag("Dice"))
+            {
+                _humanPlayerDiceTransforms[i] = transf;
+                i++;
+            }
         }
-        for (int k = 0; k < compDiceTransforms.Length; k++)
+        int j = 0;
+        foreach (var transf in compDiceTransforms)
         {
-            if (k == 0)
-                continue;
-            _computerPlayerDiceTransforms[k - 1] = compDiceTransforms[k];
+            if (transf.gameObject.CompareTag("Dice"))
+            {
+                _computerPlayerDiceTransforms[j] = transf;
+                j++;
+            }
         }
 
+        StartCoroutine(CanvasManager.Instance.ShowAnnoucement("Round " + _roundNumber));
         StartCoroutine(ChangeState(GameState.PlayerTurn, 1.0f));
     }
 
     private void HandlePlayerTurn()
     {
-        diceZoomInCamera.Priority = 5;
-        _humanPlayer.KeepDicesNearby(true);
-        _computerPlayer.KeepDicesNearby(false);
+        DiceZoomInCamera.Priority = 5;
+        _humanPlayer.KeepDicesNearby();
+        _computerPlayer.KeepDicesNearby();
         foreach (var transform in _computerPlayerDiceTransforms)
         {
-            diceTargetGroup.RemoveMember(transform);
+            DiceTargetGroup.RemoveMember(transform);
         }
         foreach (var transform in _humanPlayerDiceTransforms)
         {
-            diceTargetGroup.AddMember(transform, 1, 0);
+            DiceTargetGroup.AddMember(transform, 1, 0);
         }
 
-        _humanPlayer.isWaitingToRoll = true;
+        _humanPlayer.IsWaitingToRoll = true;
     }
 
     private void HandleReroll(bool isHumanPlayerRerolling)
     {
-        diceZoomInCamera.Priority = 11;
+        DiceZoomInCamera.Priority = 11;
 
         // Every reroll is optional
         if (isHumanPlayerRerolling)
         {
 			_humanPlayer.CurrentHighlightedDice = 0;
-			_humanPlayer.isRerolling = true;
+			_humanPlayer.IsRerolling = true;
         }
         else
         {
@@ -174,16 +182,16 @@ public class GameManager : Singleton<GameManager>
 
     private void HandleOpponentTurn()
     {
-        diceZoomInCamera.Priority = 5;
-        _humanPlayer.KeepDicesNearby(true);
-        _computerPlayer.KeepDicesNearby(false);
+        DiceZoomInCamera.Priority = 5;
+        _humanPlayer.KeepDicesNearby();
+        _computerPlayer.KeepDicesNearby();
         foreach (var transform in _humanPlayerDiceTransforms)
         {
-            diceTargetGroup.RemoveMember(transform);
+            DiceTargetGroup.RemoveMember(transform);
         }
         foreach (var transform in _computerPlayerDiceTransforms)
         {
-            diceTargetGroup.AddMember(transform, 1, 0);
+            DiceTargetGroup.AddMember(transform, 1, 0);
         }
 
         _computerPlayer.ThrowDices();
@@ -191,14 +199,14 @@ public class GameManager : Singleton<GameManager>
 
     private void HandleHandsComparing()
     {
-        diceZoomInCamera.Priority = 5;
-        var humanHandPower = _humanPlayer.hand.handPower;
-        var computerHandPower = _computerPlayer.hand.handPower;
-        if (humanHandPower.Item1 == computerHandPower.Item1)
+        DiceZoomInCamera.Priority = 5;
+        var humanHandPower = _humanPlayer.Hand.HandPower;
+        var computerHandPower = _computerPlayer.Hand.HandPower;
+        if (humanHandPower.Item1 == computerHandPower.Item1) // hand combinations are the same
         {
-            if (humanHandPower.Item2 == computerHandPower.Item2)
+            if (humanHandPower.Item2 == computerHandPower.Item2) // if senior kickers are equal
             {
-                if (humanHandPower.Item3 == computerHandPower.Item3)
+                if (humanHandPower.Item3 == computerHandPower.Item3) // and if junior kickers are equal as well
                 {
                     _roundsWonByHuman++;
                     _roundsWonByComputer++;
@@ -212,16 +220,16 @@ public class GameManager : Singleton<GameManager>
                     _roundsWonByComputer++;
                 }
             }
-            else if (humanHandPower.Item2 > computerHandPower.Item2)
+            else if (humanHandPower.Item2 > computerHandPower.Item2) // human senior kicker is stronger
             {
                 _roundsWonByHuman++;
             }
-            else
+            else 
             {
                 _roundsWonByComputer++;
             }
         }
-        else if (humanHandPower.Item1 > computerHandPower.Item1)
+        else if (humanHandPower.Item1 > computerHandPower.Item1) // human combination is better
         {
             _roundsWonByHuman++;
         }
@@ -230,26 +238,38 @@ public class GameManager : Singleton<GameManager>
             _roundsWonByComputer++;
         }
 
-        if (_roundNumber <= 2)
+        if (_roundNumber <= 2 && _roundsWonByHuman < 2 && _roundsWonByComputer < 2)
         {
             StartCoroutine(ChangeState(GameState.PlayerTurn));
         }
-        else
+        else // it`s time to conclude the results
         {
-            if (_roundsWonByHuman == _roundsWonByComputer)
+            if (_roundsWonByHuman == _roundsWonByComputer) // one more round must be played
             {
+                Debug.Log("one more round must be played");
                 StartCoroutine(ChangeState(GameState.PlayerTurn));
             }
             else if (_roundsWonByHuman > _roundsWonByComputer)
             {
-                StartCoroutine(ChangeState(GameState.Win));
+                StartCoroutine(ChangeState(GameState.Win, 1f));
             }
             else
             {
-                StartCoroutine(ChangeState(GameState.Lose));
+                StartCoroutine(ChangeState(GameState.Defeat, 1f)); // you lose :(
             }
         }
 
         _roundNumber++;
+        CanvasManager.Instance.UpdateRoundsInfo(_roundsWonByHuman, _roundsWonByComputer, _roundNumber);
+    }
+
+    private void HandleWin()
+    {
+        StartCoroutine(CanvasManager.Instance.ShowAnnoucement("You won!"));
+    }
+
+    private void HandleDefeat()
+    {
+        StartCoroutine(CanvasManager.Instance.ShowAnnoucement("You lost!"));
     }
 }
