@@ -44,7 +44,10 @@ public class HumanPlayer : BasePlayer
             }
             _resultsReceivedCounter = 0;
             EvaluateHand();
-            UpdateUI((DiceFace[])Hand.Mask.Clone());
+            if (GameManager.Instance.State == GameState.PlayerTurn)
+            {
+                UpdateUI((DiceFace[])Hand.Mask.Clone());
+            }
             StartCoroutine(GameManager.Instance.ChangeState(GameState.Reroll, true));
         }
     }

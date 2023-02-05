@@ -233,7 +233,7 @@ public class GameManager : Singleton<GameManager>
             _roundsWonByComputer++;
         }
 
-        if (_roundNumber <= 2)
+        if (_roundNumber <= 2 && _roundsWonByHuman < 2 && _roundsWonByComputer < 2)
         {
             StartCoroutine(ChangeState(GameState.PlayerTurn));
         }
@@ -241,18 +241,21 @@ public class GameManager : Singleton<GameManager>
         {
             if (_roundsWonByHuman == _roundsWonByComputer) // one more round must be played
             {
+                Debug.Log("one more round must be played");
                 StartCoroutine(ChangeState(GameState.PlayerTurn));
             }
             else if (_roundsWonByHuman > _roundsWonByComputer)
             {
-                StartCoroutine(ChangeState(GameState.Win));
+                StartCoroutine(ChangeState(GameState.Win, 1f));
             }
             else
             {
-                StartCoroutine(ChangeState(GameState.Lose)); // you lose :(
+                StartCoroutine(ChangeState(GameState.Lose, 1f)); // you lose :(
             }
         }
 
         _roundNumber++;
+        CanvasManager.Instance.UpdateRoundsInfo(_roundsWonByHuman, _roundsWonByComputer);
+        Debug.Log(_roundNumber + " " + _roundsWonByHuman + " " + _roundsWonByComputer);
     }
 }

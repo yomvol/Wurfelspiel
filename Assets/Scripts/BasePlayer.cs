@@ -64,7 +64,10 @@ public abstract class BasePlayer : MonoBehaviour
 
             _resultsReceivedCounter = 0;
             EvaluateHand();
-            UpdateUI((DiceFace[])Hand.Mask.Clone());
+            if (GameManager.Instance.State == GameState.Reroll)
+            {
+                UpdateUI((DiceFace[])Hand.Mask.Clone());
+            }
             Debug.Log($"{gameObject.name} got {Hand.HandPower.Item1} of {Hand.HandPower.Item2}");
         }
     }
@@ -88,8 +91,9 @@ public abstract class BasePlayer : MonoBehaviour
 
     protected virtual void EvaluateHand()
     {
+        _dicesToReroll.Clear();
         Array.Sort(Hand.Mask);
-        
+
         // Are there 3 or more dice of the same value?
         var groups = Hand.Mask.GroupBy(v => v);
         DictionaryEntry dominantGroup = new DictionaryEntry();

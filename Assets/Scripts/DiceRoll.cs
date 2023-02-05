@@ -91,7 +91,6 @@ public class DiceRoll : MonoBehaviour
                     if (ResultReadyEvent != null) ResultReadyEvent(this, null);
                 }
             }
-            //_raysFromFaces[i] = null;
         }
     }
 }

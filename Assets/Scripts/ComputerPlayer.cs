@@ -23,7 +23,10 @@ public class ComputerPlayer : BasePlayer
             }
             _resultsReceivedCounter = 0;
             EvaluateHand();
-            UpdateUI((DiceFace[])Hand.Mask.Clone());
+            if (GameManager.Instance.State == GameState.OpponentTurn)
+            {
+                UpdateUI((DiceFace[])Hand.Mask.Clone());
+            }
 
             GameManager.Instance.DiceZoomInCamera.Priority = 11;
             StartCoroutine(GameManager.Instance.ChangeState(GameState.Reroll, false, 4f));
@@ -79,7 +82,7 @@ public class ComputerPlayer : BasePlayer
             Debug.Log($"{gameObject.name} got {Hand.HandPower.Item1} of {Hand.HandPower.Item2}");
         }
 
-        StartCoroutine(GameManager.Instance.ChangeState(GameState.HandsComparing, 4f));
+        StartCoroutine(GameManager.Instance.ChangeState(GameState.HandsComparing, 6f));
     }
 
     public override void KeepDicesNearby()
@@ -95,6 +98,7 @@ public class ComputerPlayer : BasePlayer
 
     protected override void EvaluateHand()
     {
+        _dicesToReroll.Clear();
         DiceFace[] maskClone = (DiceFace[])Hand.Mask.Clone();
         Array.Sort(maskClone);
 
