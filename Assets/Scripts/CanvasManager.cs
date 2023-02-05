@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class CanvasManager : Singleton<CanvasManager>
 {
@@ -13,24 +14,25 @@ public class CanvasManager : Singleton<CanvasManager>
     public Sprite[] RedDiceSprites;
 
     [Header("Rounds info")]
-    [SerializeField] private Image[] VictoryIndicators;
+    [SerializeField] private Image[] _victoryIndicators;
+    [SerializeField] private GameObject _announcerNote;
+    [SerializeField] private TextMeshProUGUI _announcerText;
 
-
-    public void UpdateRoundsInfo(int roundsWonByHuman, int roundsWonByComputer)
+    public void UpdateRoundsInfo(int roundsWonByHuman, int roundsWonByComputer, int roundNumber)
     {
         Color col;
         if (roundsWonByHuman > 0 && roundsWonByHuman < 3)
         {
-            col = VictoryIndicators[roundsWonByHuman - 1].color;
+            col = _victoryIndicators[roundsWonByHuman - 1].color;
             col.a = 1;
-            VictoryIndicators[roundsWonByHuman - 1].color = col;
+            _victoryIndicators[roundsWonByHuman - 1].color = col;
         }
 
         if (roundsWonByComputer > 0 && roundsWonByComputer < 3)
         {
-            col = VictoryIndicators[roundsWonByComputer + 1].color;
+            col = _victoryIndicators[roundsWonByComputer + 1].color;
             col.a = 1;
-            VictoryIndicators[roundsWonByComputer + 1].color = col;
+            _victoryIndicators[roundsWonByComputer + 1].color = col;
         }
 
         foreach (var playerIcon in PlayerDiceIcons)
@@ -43,5 +45,17 @@ public class CanvasManager : Singleton<CanvasManager>
         }
         OpponentHandCombinationName.text = "Opponent combination";
         PlayerHandCombinationName.text = "Player combination";
+        StartCoroutine(ShowAnnoucement("Round " + roundNumber));
+
+    }
+
+    public IEnumerator ShowAnnoucement(string msg)
+    {
+        // TODO Do a tween
+        _announcerNote.SetActive(true);
+        _announcerText.text = msg;
+
+        yield return new WaitForSeconds(2f);
+        _announcerNote.SetActive(false);
     }
 }

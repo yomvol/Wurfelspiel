@@ -12,7 +12,7 @@ public enum GameState
     Reroll,
     HandsComparing,
     Win,
-    Lose
+    Defeat
 }
 
 public class GameManager : Singleton<GameManager>
@@ -62,8 +62,10 @@ public class GameManager : Singleton<GameManager>
                 HandleHandsComparing();
                 break;
             case GameState.Win:
+                HandleWin();
                 break;
-            case GameState.Lose:
+            case GameState.Defeat:
+                HandleDefeat();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
@@ -99,8 +101,10 @@ public class GameManager : Singleton<GameManager>
                 HandleHandsComparing();
                 break;
             case GameState.Win:
+                HandleWin();
                 break;
-            case GameState.Lose:
+            case GameState.Defeat:
+                HandleDefeat();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
@@ -139,6 +143,7 @@ public class GameManager : Singleton<GameManager>
             }
         }
 
+        StartCoroutine(CanvasManager.Instance.ShowAnnoucement("Round " + _roundNumber));
         StartCoroutine(ChangeState(GameState.PlayerTurn, 1.0f));
     }
 
@@ -250,12 +255,21 @@ public class GameManager : Singleton<GameManager>
             }
             else
             {
-                StartCoroutine(ChangeState(GameState.Lose, 1f)); // you lose :(
+                StartCoroutine(ChangeState(GameState.Defeat, 1f)); // you lose :(
             }
         }
 
         _roundNumber++;
-        CanvasManager.Instance.UpdateRoundsInfo(_roundsWonByHuman, _roundsWonByComputer);
-        Debug.Log(_roundNumber + " " + _roundsWonByHuman + " " + _roundsWonByComputer);
+        CanvasManager.Instance.UpdateRoundsInfo(_roundsWonByHuman, _roundsWonByComputer, _roundNumber);
+    }
+
+    private void HandleWin()
+    {
+        StartCoroutine(CanvasManager.Instance.ShowAnnoucement("You won!"));
+    }
+
+    private void HandleDefeat()
+    {
+        StartCoroutine(CanvasManager.Instance.ShowAnnoucement("You lost!"));
     }
 }

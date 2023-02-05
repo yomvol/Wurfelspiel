@@ -180,7 +180,7 @@ public class HumanPlayer : BasePlayer
             if (_holdSurrenderCounter > 120)
             {
                 Debug.Log("You have surrendered.");
-                StartCoroutine(GameManager.Instance.ChangeState(GameState.Lose));
+                StartCoroutine(GameManager.Instance.ChangeState(GameState.Defeat));
                 return;
             }
         }
