@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using DG.Tweening;
 
 public class Hand
 {
@@ -44,6 +45,8 @@ public abstract class BasePlayer : MonoBehaviour
             Hand.Dices[i] = Instantiate(DicePrefab, transform.position + new Vector3(0, 0, i * 0.5f), Quaternion.identity, transform);
             _rolls[i] = Hand.Dices[i].GetComponent<DiceRoll>();
         }
+
+        DOTween.Init(false, true, LogBehaviour.Default);
     }
 
     protected abstract void ResultReadyAllDicesEventHandler(object sender, EventArgs e);
