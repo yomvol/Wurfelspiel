@@ -65,7 +65,7 @@ public class DiceRoll : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "TableTop")
+        if (collision.gameObject.CompareTag("TableTop"))
         {
             Invoke("RaycastForResults", 2);
         }

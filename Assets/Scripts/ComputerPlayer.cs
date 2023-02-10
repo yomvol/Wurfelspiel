@@ -85,17 +85,6 @@ public class ComputerPlayer : BasePlayer
         StartCoroutine(GameManager.Instance.ChangeState(GameState.HandsComparing, 6f));
     }
 
-    public override void KeepDicesNearby()
-    {
-        // Are hard coded values a temporary solution?
-
-        Hand.Dices[0].transform.position = new Vector3(-2.056f, 4.176f, 1.736f);
-        Hand.Dices[1].transform.position = new Vector3(-1.806f, 4.176f, 1.601f);
-        Hand.Dices[2].transform.position = new Vector3(-1.929f, 4.176f, 1.372f);
-        Hand.Dices[3].transform.position = new Vector3(-2.179f, 4.176f, 1.264f);
-        Hand.Dices[4].transform.position = new Vector3(-2.235f, 4.176f, 1.509f);
-    }
-
     protected override void EvaluateHand()
     {
         _dicesToReroll.Clear();

@@ -20,7 +20,7 @@ PrefabInstance:
     - target: {fileID: 3098821314354706264, guid: a133597c12d5fb74a98181c759b315de,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3098821314354706264, guid: a133597c12d5fb74a98181c759b315de,
         type: 3}
@@ -71,6 +71,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DiceWithSelectionRing
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840457937981152137, guid: a133597c12d5fb74a98181c759b315de,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6422618003193234068, guid: a133597c12d5fb74a98181c759b315de,
         type: 3}

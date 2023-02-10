@@ -150,8 +150,8 @@ public class GameManager : Singleton<GameManager>
     private void HandlePlayerTurn()
     {
         DiceZoomInCamera.Priority = 5;
-        _humanPlayer.KeepDicesNearby();
-        _computerPlayer.KeepDicesNearby();
+        _humanPlayer.KeepDices();
+        _computerPlayer.KeepDices();
         foreach (var transform in _computerPlayerDiceTransforms)
         {
             DiceTargetGroup.RemoveMember(transform);
@@ -183,8 +183,8 @@ public class GameManager : Singleton<GameManager>
     private void HandleOpponentTurn()
     {
         DiceZoomInCamera.Priority = 5;
-        _humanPlayer.KeepDicesNearby();
-        _computerPlayer.KeepDicesNearby();
+        _humanPlayer.KeepDices();
+        _computerPlayer.KeepDices();
         foreach (var transform in _humanPlayerDiceTransforms)
         {
             DiceTargetGroup.RemoveMember(transform);
