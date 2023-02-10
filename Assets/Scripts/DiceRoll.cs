@@ -19,10 +19,15 @@ public class DiceRoll : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _boxCollider = GetComponent<BoxCollider>();
         _renderer = GetComponent<MeshRenderer>();
-        _renderer.enabled = false;
+        HideDice();
         _raysFromFaces = new Tuple<DiceFace, Ray>[6];
-        _rigidbody.useGravity = false;
         RollResult = DiceFace.One;
+    }
+
+    public void HideDice()
+    {
+        _renderer.enabled = false;
+        _rigidbody.useGravity = false;
     }
 
     public void ThrowDice()
