@@ -60,7 +60,7 @@ public class ComputerPlayer : BasePlayer
                     break;
             }
         }
-        CanvasManager.Instance.OpponentHandCombinationName.text = Hand.HandPower.Item1.ToString();
+        CanvasManager.Instance.OpponentHandCombinationName.text = Hand.HandPower.Item1.ToString().Replace('_', ' ');
     }
 
     public override void SelectAndReroll()
@@ -110,13 +110,13 @@ public class ComputerPlayer : BasePlayer
             if (numberOfDicesOfTheSameValue == 5)
             {
                 Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                    (HandCombination.FiveOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
+                    (HandCombination.Five_Of_a_Kind, (DiceFace)dominantGroup.Key, DiceFace.One);
                 return;
             }
             else if (numberOfDicesOfTheSameValue == 4)
             {
                 Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                    (HandCombination.FourOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
+                    (HandCombination.Four_Of_a_Kind, (DiceFace)dominantGroup.Key, DiceFace.One);
                 foreach (var group in groups)
                 {
                     if (group.Count() == 1)
@@ -137,7 +137,7 @@ public class ComputerPlayer : BasePlayer
                         if (group.Key != (DiceFace)dominantGroup.Key)
                         {
                             Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                    (HandCombination.FullHouse, (DiceFace)dominantGroup.Key, group.Key);
+                    (HandCombination.Full_House, (DiceFace)dominantGroup.Key, group.Key);
                             return;
                         }
                     }
@@ -145,7 +145,7 @@ public class ComputerPlayer : BasePlayer
                 else // we have enough info to conclude that the hand is Three of a kind
                 {
                     Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                    (HandCombination.ThreeOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
+                    (HandCombination.Three_Of_a_Kind, (DiceFace)dominantGroup.Key, DiceFace.One);
                     foreach (var diceFace in Hand.Mask)
                     {
                         if (diceFace != (DiceFace)dominantGroup.Key)
@@ -169,19 +169,19 @@ public class ComputerPlayer : BasePlayer
                 if (maskClone.SequenceEqual(fiveHighStraight))
                 {
                     Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                        (HandCombination.FiveHighStraight, DiceFace.One, DiceFace.One);
+                        (HandCombination.Five_High_Straight, DiceFace.One, DiceFace.One);
                     return;
                 }
                 else if (maskClone.SequenceEqual(sixHighStraight))
                 {
                     Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                        (HandCombination.SixHighStraight, DiceFace.One, DiceFace.One);
+                        (HandCombination.Six_High_Straight, DiceFace.One, DiceFace.One);
                     return;
                 }
                 else // high card
                 {
                     Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                        (HandCombination.HighCard, DiceFace.One, DiceFace.One);
+                        (HandCombination.High_Card, DiceFace.One, DiceFace.One);
                     _dicesToReroll.AddRange(_rolls);
                     return;
                 }
@@ -205,7 +205,7 @@ public class ComputerPlayer : BasePlayer
                     }
                     kickers.Sort();
                     Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                        (HandCombination.TwoPairs, (DiceFace)kickers[1], (DiceFace)kickers[0]);
+                        (HandCombination.Two_Pairs, (DiceFace)kickers[1], (DiceFace)kickers[0]);
                     return;
                 }
                 else if (groups.Count() == 4) // one pair

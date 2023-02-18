@@ -79,7 +79,7 @@ public class HumanPlayer : BasePlayer
                     break;
             }
         }
-        CanvasManager.Instance.PlayerHandCombinationName.text = Hand.HandPower.Item1.ToString();
+        CanvasManager.Instance.PlayerHandCombinationName.text = Hand.HandPower.Item1.ToString().Replace('_', ' ');
     }
 
     public override void SelectAndReroll()
