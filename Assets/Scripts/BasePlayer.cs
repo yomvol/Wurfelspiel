@@ -79,8 +79,6 @@ public abstract class BasePlayer : MonoBehaviour
     {
         for (int i = 0; i < NUMBER_OF_DICES; i++)
         {
-            // TODO Do a tween?
-
             _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
             _rolls[i].ThrowDice();
         }

@@ -128,4 +128,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ImpulseStrength: 0.5
-  AngularVelocity: 0.1
+  AngularVelocity: 0.4
+  ShakeDuration: 1.5
+  NumberOfLoops: 4
+  XRestraint: 0.05
+  YRestraint: 0.05
+  ZRestraint: 0.04

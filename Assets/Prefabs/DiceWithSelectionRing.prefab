@@ -77,6 +77,21 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4913803724679304349, guid: a133597c12d5fb74a98181c759b315de,
+        type: 3}
+      propertyPath: XRestraint
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 4913803724679304349, guid: a133597c12d5fb74a98181c759b315de,
+        type: 3}
+      propertyPath: YRestraint
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 4913803724679304349, guid: a133597c12d5fb74a98181c759b315de,
+        type: 3}
+      propertyPath: ShakeDuration
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 6422618003193234068, guid: a133597c12d5fb74a98181c759b315de,
         type: 3}
       propertyPath: angularVelocity
