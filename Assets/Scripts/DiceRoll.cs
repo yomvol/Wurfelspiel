@@ -1,11 +1,20 @@
 using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using DG.Tweening;
 
 public class DiceRoll : MonoBehaviour
 {
     public float ImpulseStrength = 1; // module of the force vector
     public float AngularVelocity = 0.1f;
+
+    [Header("Tweening")]
+    public float ShakeDuration = 1.5f;
+    public int NumberOfLoops = 4;
+    public float XRestraint = 0.05f; // +- 0.05
+    public float YRestraint = 0.05f;
+    public float ZRestraint = 0.04f;
+
     public DiceFace RollResult { get; private set; }
     public event EventHandler ResultReadyEvent;
 
@@ -19,15 +28,50 @@ public class DiceRoll : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _boxCollider = GetComponent<BoxCollider>();
         _renderer = GetComponent<MeshRenderer>();
-        _renderer.enabled = false;
+
+        HideDice();
+        //_rigidbody.useGravity = false;
         _raysFromFaces = new Tuple<DiceFace, Ray>[6];
-        _rigidbody.useGravity = false;
         RollResult = DiceFace.One;
     }
+
+    public void HideDice()
+    {
+        _renderer.enabled = false;
+        _rigidbody.useGravity = false;
+    }
+
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.Space))
+    //    {
+    //        ThrowDice();
+    //    }
+
+    //    if (Input.GetKeyDown(KeyCode.R))
+    //    {
+    //        RollResult = DiceFace.One;
+    //        _rigidbody.useGravity = false;
+    //        transform.position = new Vector3(0, 0.5f, Random.Range(-0.3f, 0.3f));
+    //    }
+    //}
 
     public void ThrowDice()
     {
         _renderer.enabled = true;
+
+        // do some twerking
+        float swingDuration = ShakeDuration / NumberOfLoops;
+        Vector3 endPos = new Vector3(transform.position.x + Random.Range(-XRestraint, XRestraint), 
+            transform.position.y + Random.Range(-YRestraint, YRestraint),
+            transform.position.z + Random.Range(-ZRestraint, ZRestraint));
+
+        transform.DOShakeRotation(ShakeDuration, 60, 10, 90, false, ShakeRandomnessMode.Full);
+        transform.DOMove(endPos, swingDuration, false).SetLoops(NumberOfLoops).SetEase(Ease.InOutQuad).OnComplete(ApplyForces);
+    }
+
+    private void ApplyForces()
+    {
         Vector3 impulse = new Vector3();
         impulse.y = 0;
         float angleOfImpulse = Random.Range(0.01f, 2 * MathF.PI);
@@ -65,7 +109,7 @@ public class DiceRoll : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "TableTop")
+        if (collision.gameObject.CompareTag("TableTop"))
         {
             Invoke("RaycastForResults", 2);
         }
@@ -89,6 +133,7 @@ public class DiceRoll : MonoBehaviour
                 {
                     RollResult = _raysFromFaces[i].Item1;
                     if (ResultReadyEvent != null) ResultReadyEvent(this, null);
+                    //Debug.Log(gameObject.name + ": " + RollResult.ToString());
                 }
             }
         }

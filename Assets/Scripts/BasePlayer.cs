@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using DG.Tweening;
 
 public class Hand
 {
@@ -17,7 +18,7 @@ public class Hand
     {
         Mask = new DiceFace[BasePlayer.NUMBER_OF_DICES];
         Dices = new GameObject[BasePlayer.NUMBER_OF_DICES];
-        HandPower = new Tuple<HandCombination, DiceFace, DiceFace>(HandCombination.HighCard, DiceFace.One, DiceFace.One);
+        HandPower = new Tuple<HandCombination, DiceFace, DiceFace>(HandCombination.High_Card, DiceFace.One, DiceFace.One);
     }
 }
 
@@ -41,9 +42,11 @@ public abstract class BasePlayer : MonoBehaviour
         for (int i = 0; i < NUMBER_OF_DICES; i++)
         {
             Hand.Mask[i] = DiceFace.Two;
-            Hand.Dices[i] = Instantiate(DicePrefab, transform.position + new Vector3(0, 0, i * 0.5f), Quaternion.identity, transform);
+            Hand.Dices[i] = Instantiate(DicePrefab, transform.position + new Vector3(0, 0, i * 0.1f), Quaternion.identity, transform);
             _rolls[i] = Hand.Dices[i].GetComponent<DiceRoll>();
         }
+
+        DOTween.Init(false, true, LogBehaviour.Default);
     }
 
     protected abstract void ResultReadyAllDicesEventHandler(object sender, EventArgs e);
@@ -76,14 +79,20 @@ public abstract class BasePlayer : MonoBehaviour
     {
         for (int i = 0; i < NUMBER_OF_DICES; i++)
         {
-            // TODO Do a tween?
-            Hand.Dices[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
             _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
             _rolls[i].ThrowDice();
         }
     }
 
-    public abstract void KeepDicesNearby();
+    public void KeepDices()
+    {
+        for (int i = 0; i < NUMBER_OF_DICES; i++)
+        {
+            _rolls[i].HideDice();
+            Hand.Dices[i].transform.localPosition = new Vector3(0, 0, i * 0.1f);
+            Hand.Dices[i].transform.rotation = Quaternion.identity;
+        }
+    }
 
     public abstract void SelectAndReroll();
 
@@ -113,13 +122,13 @@ public abstract class BasePlayer : MonoBehaviour
             if (numberOfDicesOfTheSameValue == 5)
             {
                 Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                    (HandCombination.FiveOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
+                    (HandCombination.Five_Of_a_Kind, (DiceFace)dominantGroup.Key, DiceFace.One);
                 return;
             }
             else if (numberOfDicesOfTheSameValue == 4)
             {
                 Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                    (HandCombination.FourOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
+                    (HandCombination.Four_Of_a_Kind, (DiceFace)dominantGroup.Key, DiceFace.One);
                 return;
             }
             else // 3 same dices. Is there a full house or no?
@@ -131,7 +140,7 @@ public abstract class BasePlayer : MonoBehaviour
                         if (group.Key != (DiceFace)dominantGroup.Key)
                         {
                             Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                    (HandCombination.FullHouse, (DiceFace)dominantGroup.Key, group.Key);
+                    (HandCombination.Full_House, (DiceFace)dominantGroup.Key, group.Key);
                             return;
                         }
                     }
@@ -139,7 +148,7 @@ public abstract class BasePlayer : MonoBehaviour
                 else // we have enough info to conclude that the hand is Three of a kind
                 {
                     Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                    (HandCombination.ThreeOfKind, (DiceFace)dominantGroup.Key, DiceFace.One);
+                    (HandCombination.Three_Of_a_Kind, (DiceFace)dominantGroup.Key, DiceFace.One);
                     return;
                 }
             }
@@ -155,19 +164,19 @@ public abstract class BasePlayer : MonoBehaviour
                 if (Hand.Mask.SequenceEqual(fiveHighStraight))
                 {
                     Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                        (HandCombination.FiveHighStraight, DiceFace.One, DiceFace.One);
+                        (HandCombination.Five_High_Straight, DiceFace.One, DiceFace.One);
                     return;
                 }
                 else if (Hand.Mask.SequenceEqual(sixHighStraight))
                 {
                     Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                        (HandCombination.SixHighStraight, DiceFace.One, DiceFace.One);
+                        (HandCombination.Six_High_Straight, DiceFace.One, DiceFace.One);
                     return;
                 }
                 else // high card
                 {
                     Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                        (HandCombination.HighCard, DiceFace.One, DiceFace.One);
+                        (HandCombination.High_Card, DiceFace.One, DiceFace.One);
                     return;
                 }
             }
@@ -185,7 +194,7 @@ public abstract class BasePlayer : MonoBehaviour
                     }
                     kickers.Sort();
                     Hand.HandPower = new Tuple<HandCombination, DiceFace, DiceFace>
-                        (HandCombination.TwoPairs, (DiceFace)kickers[1], (DiceFace)kickers[0]);
+                        (HandCombination.Two_Pairs, (DiceFace)kickers[1], (DiceFace)kickers[0]);
                     return;
                 }
                 else if (groups.Count() == 4) // one pair

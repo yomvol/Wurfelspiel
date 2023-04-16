@@ -5,13 +5,13 @@
 
 public enum HandCombination
 {
-    HighCard = 1,
+    High_Card = 1,
     Pair,
-    TwoPairs,
-    ThreeOfKind,
-    FiveHighStraight,
-    SixHighStraight,
-    FullHouse,
-    FourOfKind,
-    FiveOfKind
+    Two_Pairs,
+    Three_Of_a_Kind,
+    Five_High_Straight,
+    Six_High_Straight,
+    Full_House,
+    Four_Of_a_Kind,
+    Five_Of_a_Kind
 }

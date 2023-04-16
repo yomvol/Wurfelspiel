@@ -79,7 +79,7 @@ public class HumanPlayer : BasePlayer
                     break;
             }
         }
-        CanvasManager.Instance.PlayerHandCombinationName.text = Hand.HandPower.Item1.ToString();
+        CanvasManager.Instance.PlayerHandCombinationName.text = Hand.HandPower.Item1.ToString().Replace('_', ' ');
     }
 
     public override void SelectAndReroll()
@@ -195,14 +195,5 @@ public class HumanPlayer : BasePlayer
         {
             SelectAndReroll();
         }
-    }
-
-    public override void KeepDicesNearby()
-    {
-        Hand.Dices[0].transform.position = new Vector3(1.873f, 4.176f, -1.383f);
-        Hand.Dices[1].transform.position = new Vector3(2.034f, 4.176f, -1.084f);
-        Hand.Dices[2].transform.position = new Vector3(1.916f, 4.176f, -0.813f);
-        Hand.Dices[3].transform.position = new Vector3(2.286f, 4.176f, -0.964f);
-        Hand.Dices[4].transform.position = new Vector3(2.161f, 4.176f, -1.456f);
     }
 }
