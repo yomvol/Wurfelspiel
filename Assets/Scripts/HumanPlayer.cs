@@ -1,13 +1,25 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class HumanPlayer : BasePlayer
 {
+    private PlayerInput _playerInput;
+    private InputAction _throwAction;
+    private InputAction _confirmAction;
+    private InputAction _throwSelectedAction;
+    private InputAction _surrenderAction;
+    private InputAction _MenuAction;
+    private InputAction _cycleAction;
+
+    private bool _areDicesFollowCursor = false;
     private SpriteRenderer[] _selectionRingRenderers;
-    private Color32 _selectedCol;
-    private Color32 _selectedAndCursorHoveringCol;
-    private int _holdSurrenderCounter = 0;
+    private Vector3 _initPos;
+
+    [SerializeField] private Color32 _selectedColor;
+    [SerializeField] private Color32 _selectedAndCursorHoveringCol;
+    [SerializeField] private LayerMask _raycastWhiteList;
 
     [HideInInspector] public int CurrentHighlightedDice;
     [HideInInspector] public bool IsWaitingToRoll;
@@ -16,9 +28,21 @@ public class HumanPlayer : BasePlayer
     protected override void Initialize()
     {
         base.Initialize();
+        _initPos = transform.position;
+
+        _playerInput = GetComponent<PlayerInput>();
+        _throwAction = _playerInput.actions["Throw"];
+        _confirmAction = _playerInput.actions["ConfirmSelection"];
+        _throwSelectedAction = _playerInput.actions["ThrowSelected"];
+        _surrenderAction = _playerInput.actions["Surrender"];
+        _MenuAction = _playerInput.actions["Menu"];
+        _cycleAction = _playerInput.actions["CycleSelection"];
+        _throwAction.performed += OnThrowStarted;
+        _throwAction.canceled += OnThrowReleased;
+        _surrenderAction.performed += OnSurrender;
+        _MenuAction.performed += OnMenu;
+        
         _selectionRingRenderers = new SpriteRenderer[NUMBER_OF_DICES];
-        _selectedCol = new Color32(255, 120, 0, 255);
-        _selectedAndCursorHoveringCol = new Color32(255, 49, 49, 255);
 
         for (int i = 0; i < NUMBER_OF_DICES; i++)
         {
@@ -29,6 +53,14 @@ public class HumanPlayer : BasePlayer
     private void Start()
     {
         Initialize();
+    }
+
+    private void OnDisable()
+    {
+        _throwAction.performed -= OnThrowStarted;
+        _throwAction.canceled -= OnThrowReleased;
+        _surrenderAction.performed -= OnSurrender;
+        _MenuAction.performed -= OnMenu;
     }
 
     protected override void ResultReadyAllDicesEventHandler(object sender, EventArgs e)
@@ -87,8 +119,8 @@ public class HumanPlayer : BasePlayer
         SpriteRenderer currentRenderer = _selectionRingRenderers[CurrentHighlightedDice];
         currentRenderer.transform.rotation = Quaternion.LookRotation(transform.up, transform.forward);
         currentRenderer.enabled = true;
-        
-        if (Keyboard.current.eKey.wasPressedThisFrame)
+
+        if (_confirmAction.triggered)
         {
             if (!_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
             {
@@ -101,51 +133,56 @@ public class HumanPlayer : BasePlayer
                 _dicesToReroll.Remove(_rolls[CurrentHighlightedDice]);
             }
         }
-        else if (Keyboard.current.dKey.wasPressedThisFrame)
+        else if (_cycleAction.triggered) // d key
         {
-            if (!_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
-            {
-                currentRenderer.enabled = false;
-            }
-            else
-            {
-                currentRenderer.color = _selectedCol;
-            }
+            Vector2 vectorInput = _cycleAction.ReadValue<Vector2>();
 
-            CurrentHighlightedDice++;
-            if (CurrentHighlightedDice >= NUMBER_OF_DICES)
+            if (vectorInput == Vector2.right)
             {
-                CurrentHighlightedDice = 0;
-            }
+                if (!_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
+                {
+                    currentRenderer.enabled = false;
+                }
+                else
+                {
+                    currentRenderer.color = _selectedColor;
+                }
 
-            if (_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
+                CurrentHighlightedDice++;
+                if (CurrentHighlightedDice >= NUMBER_OF_DICES)
+                {
+                    CurrentHighlightedDice = 0;
+                }
+
+                if (_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
+                {
+                    _selectionRingRenderers[CurrentHighlightedDice].color = _selectedAndCursorHoveringCol;
+                }
+            }
+            else if (vectorInput == Vector2.left)
             {
-                _selectionRingRenderers[CurrentHighlightedDice].color = _selectedAndCursorHoveringCol;
+                if (!_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
+                {
+                    currentRenderer.enabled = false;
+                }
+                else
+                {
+                    currentRenderer.color = _selectedColor;
+                }
+
+                CurrentHighlightedDice--;
+                if (CurrentHighlightedDice < 0)
+                {
+                    CurrentHighlightedDice = NUMBER_OF_DICES - 1;
+                }
+
+                if (_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
+                {
+                    _selectionRingRenderers[CurrentHighlightedDice].color = _selectedAndCursorHoveringCol;
+                }
             }
         }
-        else if (Keyboard.current.aKey.wasPressedThisFrame)
-        {
-            if (!_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
-            {
-                currentRenderer.enabled = false;
-            }
-            else
-            {
-                currentRenderer.color = _selectedCol;
-            }
-
-            CurrentHighlightedDice--;
-            if (CurrentHighlightedDice < 0)
-            {
-                CurrentHighlightedDice = NUMBER_OF_DICES - 1;
-            }
-
-            if (_dicesToReroll.Contains(_rolls[CurrentHighlightedDice]))
-            {
-                _selectionRingRenderers[CurrentHighlightedDice].color = _selectedAndCursorHoveringCol;
-            }
-        }
-        else if (Keyboard.current.fKey.wasPressedThisFrame)
+        else if (_throwSelectedAction.triggered)
         {
             IsRerolling = false;
             currentRenderer.enabled = false;
@@ -159,41 +196,87 @@ public class HumanPlayer : BasePlayer
                     renderer.enabled = false;
                     _dicesToReroll[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
                     _dicesToReroll[i].ResultReadyEvent += ResultReadyRerollDicesEventHandler;
-                    _dicesToReroll[i].ThrowDice();
+                    _dicesToReroll[i].ThrowDiceShaken();
                 }
             }
             else
             {
                 Debug.Log($"{gameObject.name} got {Hand.HandPower.Item1} of {Hand.HandPower.Item2}");
             }
-            
+
             StartCoroutine(GameManager.Instance.ChangeState(GameState.OpponentTurn, 4f));
         }
     }
 
-    private void Update()
+    private void ReturnToInitPos()
     {
-        if (Keyboard.current.lKey.isPressed)
+        transform.position = _initPos;
+    }
+
+    private void OnThrowStarted(InputAction.CallbackContext ctx)
+    {
+        if (IsWaitingToRoll)
         {
-            _holdSurrenderCounter++;
-            // TODO add some kind of indicator of button holding, make it depend on time
-            if (_holdSurrenderCounter > 120)
+            _areDicesFollowCursor = true;
+            for (int i = 0; i < NUMBER_OF_DICES; i++)
             {
-                Debug.Log("You have surrendered.");
-                StartCoroutine(GameManager.Instance.ChangeState(GameState.Defeat));
-                return;
+                _rolls[i].StartShaking();
             }
         }
+    }
 
-        if (IsWaitingToRoll && Keyboard.current.spaceKey.wasPressedThisFrame)
+    private void OnThrowReleased(InputAction.CallbackContext ctx)
+    {
+        if (IsWaitingToRoll)
         {
+            _areDicesFollowCursor = false;
             IsWaitingToRoll = false;
-            ThrowDices();
+            ReturnToInitPos();
+            for (int i = 0; i < NUMBER_OF_DICES; i++)
+            {
+                _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
+                _rolls[i].ApplyForces();
+            }
         }
+    }
 
+    private void OnSurrender(InputAction.CallbackContext ctx)
+    {
+        Debug.Log("You have surrendered.");
+        _areDicesFollowCursor = false;
+        IsWaitingToRoll = false;
+        ReturnToInitPos();
+        StartCoroutine(GameManager.Instance.ChangeState(GameState.Defeat));
+    }
+
+    private void OnMenu(InputAction.CallbackContext ctx)
+    {
+        // TODO implement menu call
+        // resume, return to main menu, exit to desktop etc
+    }
+
+    private void Update()
+    {
         if (IsRerolling)
         {
             SelectAndReroll();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (_areDicesFollowCursor)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+            if (Physics.Raycast(ray, out RaycastHit hit, 10f, _raycastWhiteList))
+            {
+                if (hit.transform.CompareTag("TableTop"))
+                {
+                    Debug.Log(hit.transform.name);
+                    transform.position = new Vector3(hit.point.x, 1.2f, hit.point.z);
+                }
+            }
         }
     }
 }

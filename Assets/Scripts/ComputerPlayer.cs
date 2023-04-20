@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class ComputerPlayer : BasePlayer
 {
+
     private void Start()
     {
         Initialize();
@@ -71,7 +72,7 @@ public class ComputerPlayer : BasePlayer
             {
                 _dicesToReroll[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
                 _dicesToReroll[i].ResultReadyEvent += ResultReadyRerollDicesEventHandler;
-                _dicesToReroll[i].ThrowDice();
+                _dicesToReroll[i].ThrowDiceShaken();
             }
         }
         else

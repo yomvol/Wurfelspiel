@@ -42,7 +42,7 @@ public abstract class BasePlayer : MonoBehaviour
         for (int i = 0; i < NUMBER_OF_DICES; i++)
         {
             Hand.Mask[i] = DiceFace.Two;
-            Hand.Dices[i] = Instantiate(DicePrefab, transform.position + new Vector3(0, 0, i * 0.1f), Quaternion.identity, transform);
+            Hand.Dices[i] = Instantiate(DicePrefab, transform.position + new Vector3(0, 0, i * 0.1f - 0.2f), Quaternion.identity, transform);
             _rolls[i] = Hand.Dices[i].GetComponent<DiceRoll>();
         }
 
@@ -80,7 +80,7 @@ public abstract class BasePlayer : MonoBehaviour
         for (int i = 0; i < NUMBER_OF_DICES; i++)
         {
             _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
-            _rolls[i].ThrowDice();
+            _rolls[i].ThrowDiceShaken();
         }
     }
 
@@ -89,7 +89,7 @@ public abstract class BasePlayer : MonoBehaviour
         for (int i = 0; i < NUMBER_OF_DICES; i++)
         {
             _rolls[i].HideDice();
-            Hand.Dices[i].transform.localPosition = new Vector3(0, 0, i * 0.1f);
+            Hand.Dices[i].transform.localPosition = new Vector3(0, 0, i * 0.1f - 0.2f);
             Hand.Dices[i].transform.rotation = Quaternion.identity;
         }
     }
