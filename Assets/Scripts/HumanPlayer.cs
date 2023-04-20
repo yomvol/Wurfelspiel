@@ -273,7 +273,6 @@ public class HumanPlayer : BasePlayer
             {
                 if (hit.transform.CompareTag("TableTop"))
                 {
-                    Debug.Log(hit.transform.name);
                     transform.position = new Vector3(hit.point.x, 1.2f, hit.point.z);
                 }
             }

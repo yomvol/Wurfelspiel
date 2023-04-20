@@ -2390,8 +2390,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 97, y: -32}
-  m_SizeDelta: {x: 63.1976, y: 65.73632}
+  m_AnchoredPosition: {x: 96.4, y: -29.2}
+  m_SizeDelta: {x: 62, y: 59}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &78720334
 MonoBehaviour:
@@ -2747,7 +2747,7 @@ PrefabInstance:
     - target: {fileID: 108145543425428440, guid: 6f008868c7036dc4e8b884979948cda7,
         type: 3}
       propertyPath: m_Intensity
-      value: 0.5
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 108145543425428440, guid: 6f008868c7036dc4e8b884979948cda7,
         type: 3}
@@ -10692,7 +10692,7 @@ RectTransform:
   m_Children:
   - {fileID: 78720333}
   m_Father: {fileID: 1985280594}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -18218,7 +18218,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 0.7169812, g: 0.34782785, b: 0, a: 1}
-  m_Intensity: 0.1
+  m_Intensity: 0.2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -18443,7 +18443,7 @@ RectTransform:
   m_Children:
   - {fileID: 1015475244}
   m_Father: {fileID: 1985280594}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -27618,7 +27618,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Throw all
+  m_text: Throw all (hold)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -35195,7 +35195,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 824042248}
   m_LocalRotation: {x: 0.3535534, y: 0.61237246, z: -0.3535534, w: 0.61237246}
-  m_LocalPosition: {x: -4014245.5, y: 6872716.5, z: 23208.785}
+  m_LocalPosition: {x: -4036538, y: 6910486.5, z: 23463.555}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -60224,7 +60224,7 @@ RectTransform:
   m_Children:
   - {fileID: 192673108}
   m_Father: {fileID: 1985280594}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -60356,7 +60356,7 @@ GameObject:
   - component: {fileID: 1452346617}
   - component: {fileID: 1452346616}
   m_Layer: 5
-  m_Name: Space
+  m_Name: LMB
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -60376,7 +60376,7 @@ RectTransform:
   m_Children:
   - {fileID: 649822222}
   m_Father: {fileID: 1985280594}
-  m_RootOrder: 4
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -60403,7 +60403,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 81bfd0dae67af304fb6a934499ea557b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 624bd4d4d1c3a2240af33145946f8b8a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -75718,7 +75718,7 @@ RectTransform:
   m_Children:
   - {fileID: 240974852}
   m_Father: {fileID: 1985280594}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -79490,11 +79490,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1452346615}
   - {fileID: 257785414}
   - {fileID: 417080715}
   - {fileID: 1439936119}
   - {fileID: 1908062338}
-  - {fileID: 1452346615}
   - {fileID: 817493014}
   m_Father: {fileID: 1985514199}
   m_RootOrder: 0
@@ -84350,7 +84350,7 @@ PrefabInstance:
     - target: {fileID: 108145543425428440, guid: 6f008868c7036dc4e8b884979948cda7,
         type: 3}
       propertyPath: m_Intensity
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 108145543425428440, guid: 6f008868c7036dc4e8b884979948cda7,
         type: 3}
@@ -84365,7 +84365,7 @@ PrefabInstance:
     - target: {fileID: 108145543425428440, guid: 6f008868c7036dc4e8b884979948cda7,
         type: 3}
       propertyPath: m_BounceIntensity
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 114522338001833202, guid: 6f008868c7036dc4e8b884979948cda7,
         type: 3}
