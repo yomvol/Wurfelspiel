@@ -75,8 +75,8 @@ public class GameManager : Singleton<GameManager>
 
         Debug.Log($"New state: {newState}");
     }
-	
-	public IEnumerator ChangeState(GameState newState, bool isHumanPlayerRerolling, float delayTime = 0f)
+
+    public IEnumerator ChangeState(GameState newState, bool isHumanPlayerRerolling, float delayTime = 0f)
     {
         yield return new WaitForSeconds(delayTime);
 
@@ -171,8 +171,8 @@ public class GameManager : Singleton<GameManager>
         // Every reroll is optional
         if (isHumanPlayerRerolling)
         {
-			_humanPlayer.CurrentHighlightedDice = 0;
-			_humanPlayer.IsRerolling = true;
+            _humanPlayer.CurrentHighlightedDice = 0;
+            _humanPlayer.IsRerolling = true;
         }
         else
         {
@@ -224,7 +224,7 @@ public class GameManager : Singleton<GameManager>
             {
                 _roundsWonByHuman++;
             }
-            else 
+            else
             {
                 _roundsWonByComputer++;
             }

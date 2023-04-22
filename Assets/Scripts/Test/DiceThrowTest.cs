@@ -3,22 +3,24 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using DG.Tweening;
 
-public class DiceRoll : MonoBehaviour
+public class DiceThrowTest : MonoBehaviour
 {
     [SerializeField] private float ImpulseStrength = 1; // module of the force vector
     [SerializeField] private float AngularVelocity = 0.1f;
 
     [Header("Tweening")]
-    [SerializeField] private float ShakeDuration = 1.5f;
+    [SerializeField] private float AIShakeDuration = 1.5f;
     [SerializeField] private int NumberOfLoops = 4;
     [SerializeField] private float XRestraint = 0.05f; // +- 0.05
     [SerializeField] private float YRestraint = 0.05f;
     [SerializeField] private float ZRestraint = 0.04f;
-    [SerializeField] private float _rotStrength = 70f;
-    [SerializeField] private int _rotVibrato = 5;
+    [SerializeField] private float _rotStrength = 60f;
+    [SerializeField] private int _rotVibrato = 10;
     [SerializeField] private float _posStrength = 0.1f;
     [SerializeField] private int _posVibrato = 3;
     [SerializeField] private float _posRand = 20;
+
+
 
     public DiceFace RollResult { get; private set; }
     public event EventHandler ResultReadyEvent;
@@ -41,13 +43,12 @@ public class DiceRoll : MonoBehaviour
 
     public void HideDice()
     {
-        _renderer.enabled = false;
+        //_renderer.enabled = false;
         _rigidbody.useGravity = false;
     }
 
     public void StartShaking()
     {
-        _renderer.enabled = true;
         // do some twerking
         transform.DOShakeRotation(duration: 100, _rotStrength, _rotVibrato, 90, false, ShakeRandomnessMode.Full);
         transform.DOShakePosition(duration: 100, _posStrength, _posVibrato, _posRand, false, false, ShakeRandomnessMode.Harmonic);
@@ -58,12 +59,12 @@ public class DiceRoll : MonoBehaviour
         _renderer.enabled = true;
 
         // do some twerking
-        float swingDuration = ShakeDuration / NumberOfLoops;
-        Vector3 endPos = new Vector3(transform.position.x + Random.Range(-XRestraint, XRestraint), 
+        float swingDuration = AIShakeDuration / NumberOfLoops;
+        Vector3 endPos = new Vector3(transform.position.x + Random.Range(-XRestraint, XRestraint),
             transform.position.y + Random.Range(-YRestraint, YRestraint),
             transform.position.z + Random.Range(-ZRestraint, ZRestraint));
 
-        transform.DOShakeRotation(ShakeDuration, 60, 10, 90, false, ShakeRandomnessMode.Full);
+        transform.DOShakeRotation(AIShakeDuration, 60, 10, 90, false, ShakeRandomnessMode.Full);
         transform.DOMove(endPos, swingDuration, false).SetLoops(NumberOfLoops).SetEase(Ease.InOutQuad).OnComplete(ApplyForces);
     }
 
@@ -98,6 +99,9 @@ public class DiceRoll : MonoBehaviour
         }
 
         angularMomentum *= AngularVelocity * _rigidbody.mass * Mathf.Pow(_boxCollider.size.x, 2.0f);
+        //Debug.DrawLine(transform.position, impulse, Color.red);
+        //Debug.DrawLine(transform.position, angularMomentum, Color.green);
+        //Debug.Log(gameObject.name + " Impulse: " + impulse.ToString() + " Ang Momentum: " + angularMomentum.ToString());
         _rigidbody.useGravity = true;
         _rigidbody.AddForce(impulse, ForceMode.Impulse);
         _rigidbody.AddRelativeTorque(angularMomentum, ForceMode.Impulse);
