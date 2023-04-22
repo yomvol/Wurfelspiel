@@ -61,7 +61,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 3
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: afae1ce53af96e946b1bc66559612768, type: 2}
@@ -134,3 +134,8 @@ MonoBehaviour:
   XRestraint: 0.05
   YRestraint: 0.05
   ZRestraint: 0.04
+  _rotStrength: 70
+  _rotVibrato: 5
+  _posStrength: 0.1
+  _posVibrato: 3
+  _posRand: 20
