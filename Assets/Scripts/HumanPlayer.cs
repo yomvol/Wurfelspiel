@@ -1,5 +1,4 @@
 using System;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -236,6 +235,7 @@ public class HumanPlayer : BasePlayer
             {
                 _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
                 _rolls[i].ApplyForces();
+                AudioManager.Instance.Play("Dice_Thrown");
             }
         }
     }
