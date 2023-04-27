@@ -75,6 +75,7 @@ public class HumanPlayer : BasePlayer
             }
             _resultsReceivedCounter = 0;
             EvaluateHand();
+            Debug.Log("Player Hand: " + Hand.ToString());
             if (GameManager.Instance.State == GameState.PlayerTurn)
             {
                 UpdateUI((DiceFace[])Hand.Mask.Clone());
@@ -235,7 +236,9 @@ public class HumanPlayer : BasePlayer
             {
                 _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
                 _rolls[i].ApplyForces();
+                #if !DEBUG
                 AudioManager.Instance.Play("Dice_Thrown");
+                #endif
             }
         }
     }

@@ -20,6 +20,12 @@ public class Hand
         Dices = new GameObject[BasePlayer.NUMBER_OF_DICES];
         HandPower = new Tuple<HandCombination, DiceFace, DiceFace>(HandCombination.High_Card, DiceFace.One, DiceFace.One);
     }
+
+    public override string ToString()
+    {
+        string str = $"{Mask[0]} : {Mask[1]} : {Mask[2]} : {Mask[3]} : {Mask[4]}";
+        return str;
+    }
 }
 
 public abstract class BasePlayer : MonoBehaviour
@@ -81,7 +87,9 @@ public abstract class BasePlayer : MonoBehaviour
         {
             _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
             _rolls[i].ThrowDiceShaken();
-            AudioManager.Instance.Play("Dice_Thrown");
+            #if !DEBUG
+                AudioManager.Instance.Play("Dice_Thrown");
+            #endif
         }
     }
 
