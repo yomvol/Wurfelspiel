@@ -18,6 +18,7 @@ public class Sound {
 	public float PitchVariance = .1f;
 
 	public bool Loop = false;
+	public bool PlayOnStart = false;
 	public AudioMixerGroup MixerGroup;
 
 	[HideInInspector]

@@ -81,6 +81,7 @@ public abstract class BasePlayer : MonoBehaviour
         {
             _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
             _rolls[i].ThrowDiceShaken();
+            AudioManager.Instance.Play("Dice_Thrown");
         }
     }
 
