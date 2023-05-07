@@ -1,7 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections;
+using DG.Tweening;
 
 public class CanvasManager : Singleton<CanvasManager>
 {
@@ -21,7 +22,7 @@ public class CanvasManager : Singleton<CanvasManager>
     [Header("Pause menu")]
     [SerializeField] private GameObject _pauseNote;
 
-    public void UpdateRoundsInfo(int roundsWonByHuman, int roundsWonByComputer, int roundNumber)
+    public void UpdateRoundsInfo(int roundsWonByHuman, int roundsWonByComputer)
     {
         Color col;
         if (roundsWonByHuman > 0 && roundsWonByHuman < 3)
@@ -48,17 +49,25 @@ public class CanvasManager : Singleton<CanvasManager>
         }
         OpponentHandCombinationName.text = "Opponent combination";
         PlayerHandCombinationName.text = "Player combination";
-        StartCoroutine(ShowAnnoucement("Round " + roundNumber));
-
+        //StartCoroutine(ShowAnnoucement("Round " + roundNumber));
     }
 
-    public IEnumerator ShowAnnoucement(string msg)
+    public IEnumerator ShowAnnoucement(string msg, int nextRoundNum = -1)
     {
-        // TODO Do a tween
+        yield return new WaitUntil(() => !_announcerNote.activeInHierarchy);
+        _announcerNote.transform.DOScale(1f, 1f);
         _announcerNote.SetActive(true);
         _announcerText.text = msg;
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(4f);
+        if (nextRoundNum != -1)
+        {
+            _announcerText.text = $"Round {nextRoundNum}";
+            yield return new WaitForSeconds(2f);
+        }
+        
+        _announcerNote.transform.DOScale(0f, 1f);
+        yield return new WaitUntil(() => _announcerNote.transform.localScale.x < 0.1f);
         _announcerNote.SetActive(false);
     }
 

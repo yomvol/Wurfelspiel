@@ -196,7 +196,8 @@ public class HumanPlayer : BasePlayer
                     renderer = _dicesToReroll[i].gameObject.GetComponentInChildren<SpriteRenderer>();
                     renderer.color = Color.white;
                     renderer.enabled = false;
-                    _dicesToReroll[i].transform.position = transform.position + new Vector3(0, 0, i * 0.5f);
+                    _dicesToReroll[i].transform.localPosition = new Vector3(0, 0, i * 0.1f - 0.2f);
+                    _dicesToReroll[i].transform.rotation = Quaternion.identity;
                     _dicesToReroll[i].ResultReadyEvent += ResultReadyRerollDicesEventHandler;
                     _dicesToReroll[i].ThrowDiceShaken();
                 }

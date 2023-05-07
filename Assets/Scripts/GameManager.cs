@@ -213,32 +213,46 @@ public class GameManager : Singleton<GameManager>
                 {
                     _roundsWonByHuman++;
                     _roundsWonByComputer++;
+                    StartCoroutine(CanvasManager.Instance.ShowAnnoucement($"Round {_roundNumber} ended with a draw!\n " +
+                        $"Your hand: {humanHandPower.Item1} vs Opponent hand: {computerHandPower.Item1}", _roundNumber + 1));
                 }
                 else if (humanHandPower.Item3 > computerHandPower.Item3)
                 {
                     _roundsWonByHuman++;
+                    StartCoroutine(CanvasManager.Instance.ShowAnnoucement($"You won round {_roundNumber}!\n " +
+                        $"Your hand: {humanHandPower.Item1} vs Opponent hand: {computerHandPower.Item1}", _roundNumber + 1));
                 }
                 else
                 {
                     _roundsWonByComputer++;
+                    StartCoroutine(CanvasManager.Instance.ShowAnnoucement($"Opponent has defeated you in round {_roundNumber}!\n " +
+                        $"Your hand: {humanHandPower.Item1} vs Opponent hand: {computerHandPower.Item1}", _roundNumber + 1));
                 }
             }
             else if (humanHandPower.Item2 > computerHandPower.Item2) // human senior kicker is stronger
             {
                 _roundsWonByHuman++;
+                StartCoroutine(CanvasManager.Instance.ShowAnnoucement($"You won round {_roundNumber}!\n " +
+                    $"Your hand: {humanHandPower.Item1} vs Opponent hand: {computerHandPower.Item1}", _roundNumber + 1));
             }
             else
             {
                 _roundsWonByComputer++;
+                StartCoroutine(CanvasManager.Instance.ShowAnnoucement($"Opponent has defeated you in round {_roundNumber}!\n " +
+                    $"Your hand: {humanHandPower.Item1} vs Opponent hand: {computerHandPower.Item1}", _roundNumber + 1));
             }
         }
         else if (humanHandPower.Item1 > computerHandPower.Item1) // human combination is better
         {
             _roundsWonByHuman++;
+            StartCoroutine(CanvasManager.Instance.ShowAnnoucement($"You won round {_roundNumber}!\n " +
+                $"Your hand: {humanHandPower.Item1} vs Opponent hand: {computerHandPower.Item1}", _roundNumber + 1));
         }
         else // computer hand is stronger
         {
             _roundsWonByComputer++;
+            StartCoroutine(CanvasManager.Instance.ShowAnnoucement($"Opponent has defeated you in round {_roundNumber}!\n " +
+                $"Your hand: {humanHandPower.Item1} vs Opponent hand: {computerHandPower.Item1}", _roundNumber + 1));
         }
 
         if (_roundNumber <= 2 && _roundsWonByHuman < 2 && _roundsWonByComputer < 2)
@@ -249,7 +263,7 @@ public class GameManager : Singleton<GameManager>
         {
             if (_roundsWonByHuman == _roundsWonByComputer) // one more round must be played
             {
-                Debug.Log("one more round must be played");
+                StartCoroutine(CanvasManager.Instance.ShowAnnoucement("One more round must be played!", _roundNumber + 1));
                 StartCoroutine(ChangeState(GameState.PlayerTurn));
             }
             else if (_roundsWonByHuman > _roundsWonByComputer)
@@ -263,7 +277,7 @@ public class GameManager : Singleton<GameManager>
         }
 
         _roundNumber++;
-        CanvasManager.Instance.UpdateRoundsInfo(_roundsWonByHuman, _roundsWonByComputer, _roundNumber);
+        CanvasManager.Instance.UpdateRoundsInfo(_roundsWonByHuman, _roundsWonByComputer);
     }
 
     private void HandleWin()
