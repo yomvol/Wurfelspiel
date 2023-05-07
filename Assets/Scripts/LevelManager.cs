@@ -22,9 +22,12 @@ public class LevelManager : PersistentSingleton<LevelManager>
         var scene = SceneManager.LoadSceneAsync(sceneName);
         scene.allowSceneActivation = false;
 
-        _menuCanvas.gameObject.SetActive(false);
-        _mainCam.GetUniversalAdditionalCameraData().renderPostProcessing = false;
-        _loadingCanvas.gameObject.SetActive(true);
+        if (_menuCanvas != null)
+        {
+            _menuCanvas.gameObject.SetActive(false);
+            _mainCam.GetUniversalAdditionalCameraData().renderPostProcessing = false;
+            _loadingCanvas.gameObject.SetActive(true);
+        }
 
         do
         {

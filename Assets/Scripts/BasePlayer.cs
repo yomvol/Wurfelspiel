@@ -33,6 +33,7 @@ public abstract class BasePlayer : MonoBehaviour
     public const int NUMBER_OF_DICES = 5;
     public GameObject DicePrefab;
     public Hand Hand { get; protected set; }
+    public Sound DiceThrowSFX;
 
     protected DiceRoll[] _rolls;
     protected List<DiceRoll> _dicesToReroll;
@@ -88,7 +89,7 @@ public abstract class BasePlayer : MonoBehaviour
             _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
             _rolls[i].ThrowDiceShaken();
             #if !DEBUG
-                AudioManager.Instance.Play("Dice_Thrown");
+            AudioManager.Instance.PlayEffect(DiceThrowSFX);
             #endif
         }
     }

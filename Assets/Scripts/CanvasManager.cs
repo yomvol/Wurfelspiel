@@ -18,6 +18,9 @@ public class CanvasManager : Singleton<CanvasManager>
     [SerializeField] private GameObject _announcerNote;
     [SerializeField] private TextMeshProUGUI _announcerText;
 
+    [Header("Pause menu")]
+    [SerializeField] private GameObject _pauseNote;
+
     public void UpdateRoundsInfo(int roundsWonByHuman, int roundsWonByComputer, int roundNumber)
     {
         Color col;
@@ -57,5 +60,41 @@ public class CanvasManager : Singleton<CanvasManager>
 
         yield return new WaitForSeconds(2f);
         _announcerNote.SetActive(false);
+    }
+
+    public void ShowPause()
+    {
+        Time.timeScale = 0.0f;
+        _pauseNote.SetActive(true);
+    }
+
+    public void ResumeGame()
+    {
+        Time.timeScale = 1.0f;
+        _pauseNote.SetActive(false);
+#if !DEBUG
+                AudioManager.Instance.PlayEffect("UI_Move");
+#endif
+    }
+
+    public void ReturnToMenu()
+    {
+        LevelManager.Instance.LoadScene("Menu");
+#if !DEBUG
+                AudioManager.Instance.PlayEffect("UI_Confirm");
+#endif
+    }
+
+    public void ExitGame()
+    {
+    #if UNITY_STANDALONE
+        Application.Quit();
+    #endif
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.ExitPlaymode();
+#endif
+#if !DEBUG
+                AudioManager.Instance.PlayEffect("UI_Confirm");
+#endif
     }
 }

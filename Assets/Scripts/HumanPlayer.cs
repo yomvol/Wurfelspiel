@@ -239,7 +239,7 @@ public class HumanPlayer : BasePlayer
                 _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
                 _rolls[i].ApplyForces();
                 #if !DEBUG
-                AudioManager.Instance.Play("Dice_Thrown");
+                AudioManager.Instance.PlayEffect(DiceThrowSFX);
                 #endif
             }
         }
@@ -256,8 +256,7 @@ public class HumanPlayer : BasePlayer
 
     private void OnMenu(InputAction.CallbackContext ctx)
     {
-        // TODO implement menu call
-        // resume, return to main menu, exit to desktop etc
+        CanvasManager.Instance.ShowPause();
     }
 
     private void Update()
