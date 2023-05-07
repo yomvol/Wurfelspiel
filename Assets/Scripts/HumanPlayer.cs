@@ -5,7 +5,8 @@ using UnityEngine.InputSystem;
 public class HumanPlayer : BasePlayer
 {
     private PlayerInput _playerInput;
-    private InputAction _throwAction;
+    private InputAction _throwStartAction;
+    private InputAction _throwReleasedAction;
     private InputAction _confirmAction;
     private InputAction _throwSelectedAction;
     private InputAction _surrenderAction;
@@ -30,14 +31,15 @@ public class HumanPlayer : BasePlayer
         _initPos = transform.position;
 
         _playerInput = GetComponent<PlayerInput>();
-        _throwAction = _playerInput.actions["Throw"];
+        _throwStartAction = _playerInput.actions["ThrowStart"];
+        _throwReleasedAction = _playerInput.actions["ThrowReleased"];
         _confirmAction = _playerInput.actions["ConfirmSelection"];
         _throwSelectedAction = _playerInput.actions["ThrowSelected"];
         _surrenderAction = _playerInput.actions["Surrender"];
         _MenuAction = _playerInput.actions["Menu"];
         _cycleAction = _playerInput.actions["CycleSelection"];
-        _throwAction.performed += OnThrowStarted;
-        _throwAction.canceled += OnThrowReleased;
+        _throwStartAction.performed += OnThrowStarted;
+        _throwReleasedAction.performed += OnThrowReleased;
         _surrenderAction.performed += OnSurrender;
         _MenuAction.performed += OnMenu;
         
@@ -56,8 +58,8 @@ public class HumanPlayer : BasePlayer
 
     private void OnDisable()
     {
-        _throwAction.performed -= OnThrowStarted;
-        _throwAction.canceled -= OnThrowReleased;
+        _throwStartAction.performed -= OnThrowStarted;
+        _throwReleasedAction.performed -= OnThrowReleased;
         _surrenderAction.performed -= OnSurrender;
         _MenuAction.performed -= OnMenu;
     }
@@ -227,7 +229,7 @@ public class HumanPlayer : BasePlayer
 
     private void OnThrowReleased(InputAction.CallbackContext ctx)
     {
-        if (IsWaitingToRoll)
+        if (IsWaitingToRoll && _areDicesFollowCursor)
         {
             _areDicesFollowCursor = false;
             IsWaitingToRoll = false;
@@ -237,7 +239,7 @@ public class HumanPlayer : BasePlayer
                 _rolls[i].ResultReadyEvent += ResultReadyAllDicesEventHandler;
                 _rolls[i].ApplyForces();
                 #if !DEBUG
-                AudioManager.Instance.Play("Dice_Thrown");
+                AudioManager.Instance.PlayEffect(DiceThrowSFX);
                 #endif
             }
         }
@@ -254,8 +256,7 @@ public class HumanPlayer : BasePlayer
 
     private void OnMenu(InputAction.CallbackContext ctx)
     {
-        // TODO implement menu call
-        // resume, return to main menu, exit to desktop etc
+        CanvasManager.Instance.ShowPause();
     }
 
     private void Update()

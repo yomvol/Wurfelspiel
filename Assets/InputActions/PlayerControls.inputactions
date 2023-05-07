@@ -15,9 +15,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Throw",
+                    "name": "ThrowStart",
                     "type": "Button",
                     "id": "a4bd8dde-1ee0-41e6-9579-09270bb8feec",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ThrowReleased",
+                    "type": "Button",
+                    "id": "73bf79a7-9742-4299-8e02-f2de9e544b2e",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -85,10 +94,10 @@
                     "name": "",
                     "id": "d37cef79-c987-42c5-b906-dc01187c0653",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "Hold",
+                    "interactions": "Hold(duration=1)",
                     "processors": "",
                     "groups": "",
-                    "action": "Throw",
+                    "action": "ThrowStart",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -166,6 +175,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Menu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "778b280f-cacc-422d-9fc3-db67a87d137b",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ThrowReleased",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

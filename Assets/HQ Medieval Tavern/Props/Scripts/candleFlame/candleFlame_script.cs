@@ -7,13 +7,8 @@ public class candleFlame_script : MonoBehaviour {
     public Camera sceneCamera;
 
     // Use this for initialization
-    void Start () {
-        sceneCamera = Camera.main;
-    }
-	
-	// Update is called once per frame
-	void Update () {
- 
+    void Awake () {
+        sceneCamera = Camera.allCameras[0];
     }
 
     void LateUpdate()  {

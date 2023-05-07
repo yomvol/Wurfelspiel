@@ -26,6 +26,9 @@ public class GameManager : Singleton<GameManager>
 
     [SerializeField] private GameObject _player;
     [SerializeField] private GameObject _computerEnemy;
+    [SerializeField] private Sound _winSFX;
+    [SerializeField] private Sound _loseSFX;
+
     private HumanPlayer _humanPlayer;
     private ComputerPlayer _computerPlayer;
     private Transform[] _humanPlayerDiceTransforms;
@@ -265,11 +268,17 @@ public class GameManager : Singleton<GameManager>
 
     private void HandleWin()
     {
+        #if !DEBUG
+        AudioManager.Instance.PlayEffect(_winSFX);
+        #endif
         StartCoroutine(CanvasManager.Instance.ShowAnnoucement("You won!"));
     }
 
     private void HandleDefeat()
     {
+        #if !DEBUG
+        AudioManager.Instance.PlayEffect(_loseSFX);
+        #endif
         StartCoroutine(CanvasManager.Instance.ShowAnnoucement("You lost!"));
     }
 }

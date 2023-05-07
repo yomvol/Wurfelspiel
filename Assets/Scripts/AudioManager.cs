@@ -10,29 +10,29 @@ using UnityEngine.SceneManagement;
 
 public class AudioManager : PersistentSingleton<AudioManager>
 {
+	public AudioMixer Mixer;
+
 	[SerializeField] private AudioMixerGroup _master;
 	[SerializeField] private AudioMixerGroup _music;
 	[SerializeField] private AudioMixerGroup _SFX;
-	[SerializeField] private AudioMixerGroup _dialog;
+	[SerializeField] private AudioMixerGroup _UI;
     [SerializeField] private Sound[] _sounds;
+    [SerializeField] private AudioSource _musicSource;
+    [SerializeField] private AudioSource _effectsSource;
+
+    private List<Sound> _musicTracks;
 	
-	private List<Sound> _musicTracks;
-	private AudioSource _musicSource;
 
 	protected override void Awake()
 	{
 		base.Awake();
 
 		_musicTracks = new List<Sound>();
-		_musicSource= GetComponent<AudioSource>();
 		foreach (Sound s in _sounds)
 		{
 			if (s.MixerGroup != _music)
 			{
-                s.Source = gameObject.AddComponent<AudioSource>();
-                s.Source.clip = s.Clip;
-                s.Source.loop = s.Clip;
-                s.Source.outputAudioMixerGroup = s.MixerGroup;
+                s.Source = _effectsSource;
             }
 			else
 			{
@@ -62,8 +62,8 @@ public class AudioManager : PersistentSingleton<AudioManager>
 		{
             _musicSource.loop = false;
             Play(_musicTracks[UnityEngine.Random.Range(1, _musicTracks.Count)]);
-			var sfx = _sounds.Where(s => s.MixerGroup != _music && s.PlayOnStart).ToArray();
-			foreach (var effect in sfx)
+			var sfx = _sounds.Where(s => s.MixerGroup == _SFX && s.PlayOnStart).ToArray();
+			foreach (var effect in sfx) // consistent in-game SFX
 			{
 				Play(effect);
 			}
@@ -103,6 +103,31 @@ public class AudioManager : PersistentSingleton<AudioManager>
 		{
             StartCoroutine(PickNextTrack(s.Clip.length, s.Name));
         }
+    }
+
+	public void PlayEffect(Sound s)
+	{
+        _effectsSource.outputAudioMixerGroup = s.MixerGroup;
+        _effectsSource.volume = s.Volume * (1f + UnityEngine.Random.Range(-s.VolumeVariance / 2f, s.VolumeVariance / 2f));
+        _effectsSource.pitch = s.Pitch * (1f + UnityEngine.Random.Range(-s.PitchVariance / 2f, s.PitchVariance / 2f));
+
+		_effectsSource.PlayOneShot(s.Clip);
+    }
+
+	public void PlayEffect(string name)
+	{
+        Sound s = Array.Find(_sounds, item => item.Name == name);
+        if (s == null)
+        {
+            Debug.LogWarning("Sound: " + name + " not found!");
+            return;
+        }
+
+        _effectsSource.outputAudioMixerGroup = s.MixerGroup;
+        _effectsSource.volume = s.Volume * (1f + UnityEngine.Random.Range(-s.VolumeVariance / 2f, s.VolumeVariance / 2f));
+        _effectsSource.pitch = s.Pitch * (1f + UnityEngine.Random.Range(-s.PitchVariance / 2f, s.PitchVariance / 2f));
+
+        _effectsSource.PlayOneShot(s.Clip);
     }
 
 	private IEnumerator PickNextTrack(float trackLength, string prevName)
