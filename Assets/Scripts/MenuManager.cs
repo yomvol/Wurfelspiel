@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
@@ -8,7 +8,7 @@ public class MenuManager : MonoBehaviour
 
     public void OnNewGameClick()
     {
-        SceneManager.LoadScene("Main");
+        LevelManager.Instance.LoadScene("Main");
     }
 
     public void OnExitClick()

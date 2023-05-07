@@ -13,7 +13,7 @@ public class AudioManager : PersistentSingleton<AudioManager>
 	[SerializeField] private AudioMixerGroup _master;
 	[SerializeField] private AudioMixerGroup _music;
 	[SerializeField] private AudioMixerGroup _SFX;
-	[SerializeField] private AudioMixerGroup _dialog;
+	[SerializeField] private AudioMixerGroup _UI;
     [SerializeField] private Sound[] _sounds;
 	
 	private List<Sound> _musicTracks;
