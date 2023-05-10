@@ -1,5 +1,8 @@
 IN DEVELOPMENT
 
-Wurfelspiel is an atmospheric dice minigame, inspired by Kingdom Come: Deliverance. It's a small, non-commercial, yet advanced (on the verge of my skills and budget) pet project. My main goal is honing skills in programming, modelling, sound managment, animations, etc. This project is supposed to be the flagship in my portfolio upon completion. Things yet to add: improved dice throwing interaction, audio (SFX and music), main menu and options, dialogue system.
+Wurfelspiel is an atmospheric dice minigame, inspired by Kingdom Come: Deliverance. It's a small, non-commercial, yet advanced (on the verge of my skills and budget) pet project. My main goal is honing skills in programming, modelling, sound managment, animations, etc. This project is supposed to be the flagship in my portfolio upon completion. Stuff yet to add: dialogue system, minor fixes.
 
-![screenshot](https://user-images.githubusercontent.com/83629932/233355378-06a44163-a41a-45e3-a245-6845bfe21ca7.png)
+More info: https://yomvol.itch.io/wurfelspiel
+
+![screenshot1](https://github.com/yomvol/Wurfelspiel/assets/83629932/f4c1b43c-7b89-4ff3-ac28-dfc879ea7b1f)
+![screenshot2](https://github.com/yomvol/Wurfelspiel/assets/83629932/d2957a63-9a4b-4756-a785-47305f38f1be)
