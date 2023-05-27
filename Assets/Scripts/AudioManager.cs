@@ -55,12 +55,22 @@ public class AudioManager : PersistentSingleton<AudioManager>
 
 		if (activeSceneName == "Menu")
 		{
-            _musicSource.loop = true;
+            try
+            {
+                _musicSource.loop = true;
+            }
+            catch { return; }
+            
             Play(_musicTracks[0]);
 		}
 		else if (activeSceneName == "Main")
 		{
-            _musicSource.loop = false;
+			try
+			{
+                _musicSource.loop = false;
+            }
+			catch { return; }
+            
             Play(_musicTracks[UnityEngine.Random.Range(1, _musicTracks.Count)]);
 			var sfx = _sounds.Where(s => s.MixerGroup == _SFX && s.PlayOnStart).ToArray();
 			foreach (var effect in sfx) // consistent in-game SFX

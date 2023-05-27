@@ -264,6 +264,18 @@ public class HumanPlayer : BasePlayer
     {
         if (IsRerolling)
         {
+            if (_dicesToReroll.Count == 0)
+            {
+                CanvasManager.Instance.PlayerEndTurnPrompt.text = "End turn";
+            }
+            else
+            {
+                CanvasManager.Instance.PlayerEndTurnPrompt.text = "Throw selected dices";
+            }
+        }
+
+        if (IsRerolling)
+        {
             SelectAndReroll();
         }
     }

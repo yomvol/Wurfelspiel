@@ -13,6 +13,7 @@ public class CanvasManager : Singleton<CanvasManager>
     public Image[] PlayerDiceIcons;
     public Sprite[] WhiteDiceSprites;
     public Sprite[] RedDiceSprites;
+    public TextMeshProUGUI PlayerEndTurnPrompt;
 
     [Header("Rounds info")]
     [SerializeField] private Image[] _victoryIndicators;

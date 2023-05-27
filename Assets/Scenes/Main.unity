@@ -6836,7 +6836,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Throw selected dices
+  m_text: End turn
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5ccb28f2365f80c4fb67874a7e9a33f9, type: 2}
   m_sharedMaterial: {fileID: -5702306529107626471, guid: 5ccb28f2365f80c4fb67874a7e9a33f9,
@@ -6864,10 +6864,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 38
+  m_fontSize: 40
   m_fontSizeBase: 38
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 2
@@ -35154,7 +35154,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 824042248}
   m_LocalRotation: {x: 0.3535534, y: 0.61237246, z: -0.3535534, w: 0.61237246}
-  m_LocalPosition: {x: -4184568.2, y: 7161180.5, z: 25188.203}
+  m_LocalPosition: {x: -4190005.8, y: 7170381, z: 25252.54}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -48074,6 +48074,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b32938c3cce449548aa1a2beae5d04d0, type: 3}
   - {fileID: 21300000, guid: 7a1a7ed6e8072c84e86c310e3889dc98, type: 3}
   - {fileID: 21300000, guid: efdcf4b027b713e48b7ef61ad07fe155, type: 3}
+  PlayerEndTurnPrompt: {fileID: 192673109}
   _victoryIndicators:
   - {fileID: 526614979}
   - {fileID: 1585344784}
@@ -55859,7 +55860,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 50, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1270013038
@@ -66074,7 +66075,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 50, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1648133130

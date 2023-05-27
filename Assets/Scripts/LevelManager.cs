@@ -15,7 +15,28 @@ public class LevelManager : PersistentSingleton<LevelManager>
     [SerializeField] private Canvas _loadingCanvas;
     [SerializeField] private Image _rotatingIndicator;
     [SerializeField] private TextMeshProUGUI _prompt;
+    [SerializeField] private float _rotationSpeed;
     private float _target;
+    private float _prevRotationTime = 0f;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        Debug.Log("Level Manager has AWAKENED!");
+        Debug.Log(SceneManager.GetActiveScene().name);
+
+        if (SceneManager.GetActiveScene().name == "Menu")
+        {
+            _mainCam = Camera.main;
+            _menuCanvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+            _loadingCanvas = GameObject.Find("LoadingCanvas").GetComponent<Canvas>();
+            _rotatingIndicator = _loadingCanvas.transform.GetChild(1).gameObject.GetComponent<Image>();
+            _prompt = _loadingCanvas.transform.GetChild(2).gameObject.GetComponent<TextMeshProUGUI>();
+            _loadingCanvas.gameObject.SetActive(false);
+            Debug.Log("Tied everything: " + _prompt.text);
+        }
+    }
 
     public async void LoadScene(string sceneName)
     {
@@ -35,6 +56,8 @@ public class LevelManager : PersistentSingleton<LevelManager>
             _target = scene.progress;
         } while (scene.progress < 0.9f);
 
+        await Task.Delay(5000);
+
         _prompt.text = "Press any key";
         _target = 1.0f;
         var tcs = new TaskCompletionSource<bool>();
@@ -52,8 +75,10 @@ public class LevelManager : PersistentSingleton<LevelManager>
 
     private void Update()
     {
-        if (_rotatingIndicator != null && _rotatingIndicator.isActiveAndEnabled)
+        if (_rotatingIndicator != null && _rotatingIndicator.isActiveAndEnabled && Time.time - _prevRotationTime > _rotationSpeed)
         {
+            _prevRotationTime = Time.time;
+
             if (_target < 1.0f)
             {
                 _rotatingIndicator.transform.RotateAround(_rotatingIndicator.transform.position, Vector3.back, _target * 360f);
