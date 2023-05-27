@@ -8,16 +8,16 @@ public class MenuManager : MonoBehaviour
 {
     [SerializeField] private GameObject _exitDialog;
     [SerializeField] TMP_Dropdown _resDropdown;
+    [SerializeField] Texture2D[] _cursors;
     private Resolution[] _resolutions;
 
     private void Start()
     {
         _resolutions = Screen.resolutions;
         _resDropdown.ClearOptions();
-
         List<string> options = new List<string>();
-
         int currentRes = 0;
+
         for (int i = 0; i < _resolutions.Length; i++)
         {
             var res = _resolutions[i];
@@ -99,5 +99,15 @@ public class MenuManager : MonoBehaviour
     {
         QualitySettings.SetQualityLevel(qualityIndex);
         AudioManager.Instance.PlayEffect("UI_Twinkle");
+    }
+
+    public void OnHoverIn()
+    {
+        Cursor.SetCursor(_cursors[1], Vector2.zero, CursorMode.Auto);
+    }
+
+    public void OnHoverOut()
+    {
+        Cursor.SetCursor(_cursors[0], Vector2.zero, CursorMode.Auto);
     }
 }

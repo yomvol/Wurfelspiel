@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using UnityEngine.InputSystem;
 
 public class CanvasManager : Singleton<CanvasManager>
 {
@@ -14,6 +15,10 @@ public class CanvasManager : Singleton<CanvasManager>
     public Sprite[] WhiteDiceSprites;
     public Sprite[] RedDiceSprites;
     public TextMeshProUGUI PlayerEndTurnPrompt;
+
+    [SerializeField] TextMeshProUGUI _playerThrowPrompt;
+    [SerializeField] Sprite[] _mouseIcons;
+    [SerializeField] Image _mouseImage;
 
     [Header("Rounds info")]
     [SerializeField] private Image[] _victoryIndicators;
@@ -106,5 +111,17 @@ public class CanvasManager : Singleton<CanvasManager>
 #if !DEBUG
                 AudioManager.Instance.PlayEffect("UI_Confirm");
 #endif
+    }
+
+    public void OnThrowStarted(InputAction.CallbackContext ctx)
+    {
+        _playerThrowPrompt.text = "Cancel throw";
+        _mouseImage.sprite = _mouseIcons[1];
+    }
+
+    public void OnThrowAborted(InputAction.CallbackContext ctx)
+    {
+        _playerThrowPrompt.text = "Throw all (hold)";
+        _mouseImage.sprite = _mouseIcons[0];
     }
 }

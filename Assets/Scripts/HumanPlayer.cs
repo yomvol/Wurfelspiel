@@ -1,11 +1,14 @@
+using DG.Tweening;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cinemachine;
 
 public class HumanPlayer : BasePlayer
 {
     private PlayerInput _playerInput;
     private InputAction _throwStartAction;
+    private InputAction _throwAbortAction;
     private InputAction _throwReleasedAction;
     private InputAction _confirmAction;
     private InputAction _throwSelectedAction;
@@ -16,6 +19,8 @@ public class HumanPlayer : BasePlayer
     private bool _areDicesFollowCursor = false;
     private SpriteRenderer[] _selectionRingRenderers;
     private Vector3 _initPos;
+
+    public CinemachineVirtualCamera ThrowTrackingCamera;
 
     [SerializeField] private Color32 _selectedColor;
     [SerializeField] private Color32 _selectedAndCursorHoveringCol;
@@ -32,6 +37,7 @@ public class HumanPlayer : BasePlayer
 
         _playerInput = GetComponent<PlayerInput>();
         _throwStartAction = _playerInput.actions["ThrowStart"];
+        _throwAbortAction = _playerInput.actions["ThrowAbort"];
         _throwReleasedAction = _playerInput.actions["ThrowReleased"];
         _confirmAction = _playerInput.actions["ConfirmSelection"];
         _throwSelectedAction = _playerInput.actions["ThrowSelected"];
@@ -39,7 +45,11 @@ public class HumanPlayer : BasePlayer
         _MenuAction = _playerInput.actions["Menu"];
         _cycleAction = _playerInput.actions["CycleSelection"];
         _throwStartAction.performed += OnThrowStarted;
+        _throwStartAction.performed += CanvasManager.Instance.OnThrowStarted;
+        _throwAbortAction.performed += OnThrowAborted;
+        _throwAbortAction.performed += CanvasManager.Instance.OnThrowAborted;
         _throwReleasedAction.performed += OnThrowReleased;
+        _throwReleasedAction.performed += CanvasManager.Instance.OnThrowAborted;
         _surrenderAction.performed += OnSurrender;
         _MenuAction.performed += OnMenu;
         
@@ -59,7 +69,11 @@ public class HumanPlayer : BasePlayer
     private void OnDisable()
     {
         _throwStartAction.performed -= OnThrowStarted;
+        _throwStartAction.performed -= CanvasManager.Instance.OnThrowStarted;
+        _throwAbortAction.performed -= OnThrowAborted;
+        _throwAbortAction.performed -= CanvasManager.Instance.OnThrowAborted;
         _throwReleasedAction.performed -= OnThrowReleased;
+        _throwReleasedAction.performed -= CanvasManager.Instance.OnThrowAborted;
         _surrenderAction.performed -= OnSurrender;
         _MenuAction.performed -= OnMenu;
     }
@@ -67,6 +81,8 @@ public class HumanPlayer : BasePlayer
     protected override void ResultReadyAllDicesEventHandler(object sender, EventArgs e)
     {
         _resultsReceivedCounter++;
+
+        
 
         if (_resultsReceivedCounter >= NUMBER_OF_DICES)
         {
@@ -221,10 +237,31 @@ public class HumanPlayer : BasePlayer
         if (IsWaitingToRoll)
         {
             _areDicesFollowCursor = true;
+
+            // switch to throwing camera
+            ThrowTrackingCamera.Priority = 12;
+
             for (int i = 0; i < NUMBER_OF_DICES; i++)
             {
                 _rolls[i].StartShaking();
             }
+        }
+    }
+
+    private void OnThrowAborted(InputAction.CallbackContext ctx)
+    {
+        if (_areDicesFollowCursor == true)
+        {
+            _areDicesFollowCursor = false;
+            foreach(var dice in _rolls)
+            {
+                dice.transform.DOKill();
+            }
+
+            // switch to POV camera
+            ThrowTrackingCamera.Priority = 6;
+            ReturnToInitPos();
+            KeepDices();
         }
     }
 

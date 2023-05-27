@@ -40,6 +40,7 @@ public class LevelManager : PersistentSingleton<LevelManager>
 
     public async void LoadScene(string sceneName)
     {
+        Cursor.visible = false;
         var scene = SceneManager.LoadSceneAsync(sceneName);
         scene.allowSceneActivation = false;
 

@@ -24,6 +24,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "ThrowAbort",
+                    "type": "Button",
+                    "id": "b12a1abf-30d1-403c-be8f-4fb818dcb1fc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "ThrowReleased",
                     "type": "Button",
                     "id": "73bf79a7-9742-4299-8e02-f2de9e544b2e",
@@ -186,6 +195,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "ThrowReleased",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7ab8ed23-888a-49d4-9a2b-e2f34c9adf28",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ThrowAbort",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
