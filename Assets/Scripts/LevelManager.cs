@@ -22,15 +22,25 @@ public class LevelManager : PersistentSingleton<LevelManager>
     protected override void Awake()
     {
         base.Awake();
+        SceneManager.sceneLoaded += Initialize;
+    }
 
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= Initialize;
+    }
+
+    private void Initialize(Scene scene, LoadSceneMode mode)
+    {
         Debug.Log("Level Manager has AWAKENED!");
         Debug.Log(SceneManager.GetActiveScene().name);
 
         if (SceneManager.GetActiveScene().name == "Menu")
         {
             _mainCam = Camera.main;
-            _menuCanvas = GameObject.Find("Canvas").GetComponent<Canvas>();
-            _loadingCanvas = GameObject.Find("LoadingCanvas").GetComponent<Canvas>();
+            var canvases = GameObject.FindObjectsOfType<Canvas>(true);
+            _menuCanvas = canvases[0];
+            _loadingCanvas = canvases[1];
             _rotatingIndicator = _loadingCanvas.transform.GetChild(1).gameObject.GetComponent<Image>();
             _prompt = _loadingCanvas.transform.GetChild(2).gameObject.GetComponent<TextMeshProUGUI>();
             _loadingCanvas.gameObject.SetActive(false);
@@ -42,36 +52,44 @@ public class LevelManager : PersistentSingleton<LevelManager>
     {
         Cursor.visible = false;
         var scene = SceneManager.LoadSceneAsync(sceneName);
-        scene.allowSceneActivation = false;
 
-        if (_menuCanvas != null)
+        if (sceneName == "Main")
         {
-            _menuCanvas.gameObject.SetActive(false);
-            _mainCam.GetUniversalAdditionalCameraData().renderPostProcessing = false;
-            _loadingCanvas.gameObject.SetActive(true);
+            scene.allowSceneActivation = false;
+
+            if (_menuCanvas != null)
+            {
+                _menuCanvas.gameObject.SetActive(false);
+                _mainCam.GetUniversalAdditionalCameraData().renderPostProcessing = false;
+                _loadingCanvas.gameObject.SetActive(true);
+            }
+
+            do
+            {
+                //await Task.Delay(100);
+                _target = scene.progress;
+            } while (scene.progress < 0.9f);
+
+            await Task.Delay(5000);
+
+            _prompt.text = "Press any key";
+            _target = 1.0f;
+            var tcs = new TaskCompletionSource<bool>();
+
+            Action<InputControl> onAnyButtonPressed = delegate (InputControl ctrl)
+            {
+                //Debug.Log($"{ctrl} pressed");
+                scene.allowSceneActivation = true;
+                tcs.TrySetResult(true);
+            };
+
+            InputSystem.onAnyButtonPress.CallOnce(onAnyButtonPressed);
+            await tcs.Task;
         }
-
-        do
+        else if (sceneName == "Menu")
         {
-            //await Task.Delay(100);
-            _target = scene.progress;
-        } while (scene.progress < 0.9f);
-
-        await Task.Delay(5000);
-
-        _prompt.text = "Press any key";
-        _target = 1.0f;
-        var tcs = new TaskCompletionSource<bool>();
-
-        Action<InputControl> onAnyButtonPressed = delegate (InputControl ctrl)
-        {
-            //Debug.Log($"{ctrl} pressed");
-            scene.allowSceneActivation = true;
-            tcs.TrySetResult(true);
-        };
-
-        InputSystem.onAnyButtonPress.CallOnce(onAnyButtonPressed);
-        await tcs.Task;
+            SceneManager.sceneLoaded -= Initialize;
+        }
     }
 
     private void Update()

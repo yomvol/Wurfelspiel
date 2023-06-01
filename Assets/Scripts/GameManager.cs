@@ -119,7 +119,9 @@ public class GameManager : Singleton<GameManager>
 
     private void HandleStarting()
     {
+        Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
+
         _roundNumber = 1;
         _humanPlayer = _player.GetComponent<HumanPlayer>();
         _computerPlayer = _computerEnemy.GetComponent<ComputerPlayer>();

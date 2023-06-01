@@ -285,6 +285,8 @@ public class HumanPlayer : BasePlayer
 
     private void OnSurrender(InputAction.CallbackContext ctx)
     {
+        if (IsRerolling) return;
+
         Debug.Log("You have surrendered.");
         _areDicesFollowCursor = false;
         IsWaitingToRoll = false;
@@ -294,6 +296,7 @@ public class HumanPlayer : BasePlayer
 
     private void OnMenu(InputAction.CallbackContext ctx)
     {
+        Cursor.visible = true;
         CanvasManager.Instance.ShowPause();
     }
 

@@ -19,6 +19,7 @@ public class CanvasManager : Singleton<CanvasManager>
     [SerializeField] TextMeshProUGUI _playerThrowPrompt;
     [SerializeField] Sprite[] _mouseIcons;
     [SerializeField] Image _mouseImage;
+    [SerializeField] Texture2D[] _cursors;
 
     [Header("Rounds info")]
     [SerializeField] private Image[] _victoryIndicators;
@@ -94,6 +95,7 @@ public class CanvasManager : Singleton<CanvasManager>
 
     public void ReturnToMenu()
     {
+        Cursor.visible = false;
         LevelManager.Instance.LoadScene("Menu");
 #if !DEBUG
                 AudioManager.Instance.PlayEffect("UI_Confirm");
@@ -123,5 +125,15 @@ public class CanvasManager : Singleton<CanvasManager>
     {
         _playerThrowPrompt.text = "Throw all (hold)";
         _mouseImage.sprite = _mouseIcons[0];
+    }
+
+    public void OnHoverIn()
+    {
+        Cursor.SetCursor(_cursors[1], Vector2.zero, CursorMode.Auto);
+    }
+
+    public void OnHoverOut()
+    {
+        Cursor.SetCursor(_cursors[0], Vector2.zero, CursorMode.Auto);
     }
 }
