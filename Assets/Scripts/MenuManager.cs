@@ -9,10 +9,13 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject _exitDialog;
     [SerializeField] TMP_Dropdown _resDropdown;
     [SerializeField] Texture2D[] _cursors;
+    [SerializeField] private Button _newGameButton;
+    [SerializeField] private Button _exitButton;
     private Resolution[] _resolutions;
 
     private void Start()
     {
+        Cursor.visible = true;
         _resolutions = Screen.resolutions;
         _resDropdown.ClearOptions();
         List<string> options = new List<string>();
@@ -58,6 +61,8 @@ public class MenuManager : MonoBehaviour
     public void OnOptionsClick()
     {
         AudioManager.Instance.PlayEffect("UI_Move");
+        _newGameButton.interactable = !_newGameButton.interactable;
+        _exitButton.interactable = !_exitButton.interactable;
     }
 
     public void SetMasterVolume(float volume)
