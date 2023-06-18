@@ -136,6 +136,9 @@ public class DiceRoll : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// legacy approach
+    /// </summary>
     private void RaycastForResults()
     {
         _raysFromFaces[0] = new Tuple<DiceFace, Ray>(DiceFace.One, new Ray(transform.position, transform.right));
