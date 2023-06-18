@@ -109,7 +109,30 @@ public class DiceRoll : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("TableTop"))
         {
-            Invoke("RaycastForResults", 2);
+            //Invoke("RaycastForResults", 2);
+            Invoke("DetermineOrientation", 2);
+        }
+    }
+
+    private void DetermineOrientation()
+    {
+        Tuple<DiceFace, Vector3>[] directions = new Tuple<DiceFace, Vector3>[6];
+        directions[0] = new Tuple<DiceFace, Vector3>(DiceFace.One, transform.right * -1.0f);
+        directions[1] = new Tuple<DiceFace, Vector3>(DiceFace.Two, transform.up);
+        directions[2] = new Tuple<DiceFace, Vector3>(DiceFace.Three, transform.right);
+        directions[3] = new Tuple<DiceFace, Vector3>(DiceFace.Four, transform.up * -1.0f);
+        directions[4] = new Tuple<DiceFace, Vector3>(DiceFace.Five, transform.forward);
+        directions[5] = new Tuple<DiceFace, Vector3>(DiceFace.Six, transform.forward* -1.0f);
+
+        for (int i = 0; i < directions.Length; i++) 
+        {
+            if (Vector3.Dot(Vector3.up, directions[i].Item2) >= 0.9)
+            {
+                RollResult = directions[i].Item1;
+                Debug.Log(RollResult);
+                if (ResultReadyEvent != null) ResultReadyEvent(this, null);
+                return;
+            }
         }
     }
 

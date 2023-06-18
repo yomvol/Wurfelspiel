@@ -82,8 +82,6 @@ public class HumanPlayer : BasePlayer
     {
         _resultsReceivedCounter++;
 
-        
-
         if (_resultsReceivedCounter >= NUMBER_OF_DICES)
         {
             for (int i = 0; i < NUMBER_OF_DICES; i++)
