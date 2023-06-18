@@ -42,6 +42,8 @@ public class DiceRoll : MonoBehaviour
     public void HideDice()
     {
         _renderer.enabled = false;
+        _rigidbody.velocity = Vector3.zero;
+        _rigidbody.angularVelocity = Vector3.zero;
         _rigidbody.useGravity = false;
     }
 

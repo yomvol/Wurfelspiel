@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using UnityEngine.InputSystem;
 
 public class CanvasManager : Singleton<CanvasManager>
 {
@@ -13,6 +14,12 @@ public class CanvasManager : Singleton<CanvasManager>
     public Image[] PlayerDiceIcons;
     public Sprite[] WhiteDiceSprites;
     public Sprite[] RedDiceSprites;
+    public TextMeshProUGUI PlayerEndTurnPrompt;
+
+    [SerializeField] TextMeshProUGUI _playerThrowPrompt;
+    [SerializeField] Sprite[] _mouseIcons;
+    [SerializeField] Image _mouseImage;
+    [SerializeField] Texture2D[] _cursors;
 
     [Header("Rounds info")]
     [SerializeField] private Image[] _victoryIndicators;
@@ -88,6 +95,7 @@ public class CanvasManager : Singleton<CanvasManager>
 
     public void ReturnToMenu()
     {
+        Cursor.visible = false;
         LevelManager.Instance.LoadScene("Menu");
 #if !DEBUG
                 AudioManager.Instance.PlayEffect("UI_Confirm");
@@ -105,5 +113,27 @@ public class CanvasManager : Singleton<CanvasManager>
 #if !DEBUG
                 AudioManager.Instance.PlayEffect("UI_Confirm");
 #endif
+    }
+
+    public void OnThrowStarted(InputAction.CallbackContext ctx)
+    {
+        _playerThrowPrompt.text = "Cancel throw";
+        _mouseImage.sprite = _mouseIcons[1];
+    }
+
+    public void OnThrowAborted(InputAction.CallbackContext ctx)
+    {
+        _playerThrowPrompt.text = "Throw all (hold)";
+        _mouseImage.sprite = _mouseIcons[0];
+    }
+
+    public void OnHoverIn()
+    {
+        Cursor.SetCursor(_cursors[1], Vector2.zero, CursorMode.Auto);
+    }
+
+    public void OnHoverOut()
+    {
+        Cursor.SetCursor(_cursors[0], Vector2.zero, CursorMode.Auto);
     }
 }

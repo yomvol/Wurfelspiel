@@ -8,16 +8,19 @@ public class MenuManager : MonoBehaviour
 {
     [SerializeField] private GameObject _exitDialog;
     [SerializeField] TMP_Dropdown _resDropdown;
+    [SerializeField] Texture2D[] _cursors;
+    [SerializeField] private Button _newGameButton;
+    [SerializeField] private Button _exitButton;
     private Resolution[] _resolutions;
 
     private void Start()
     {
+        Cursor.visible = true;
         _resolutions = Screen.resolutions;
         _resDropdown.ClearOptions();
-
         List<string> options = new List<string>();
-
         int currentRes = 0;
+
         for (int i = 0; i < _resolutions.Length; i++)
         {
             var res = _resolutions[i];
@@ -58,6 +61,8 @@ public class MenuManager : MonoBehaviour
     public void OnOptionsClick()
     {
         AudioManager.Instance.PlayEffect("UI_Move");
+        _newGameButton.interactable = !_newGameButton.interactable;
+        _exitButton.interactable = !_exitButton.interactable;
     }
 
     public void SetMasterVolume(float volume)
@@ -99,5 +104,15 @@ public class MenuManager : MonoBehaviour
     {
         QualitySettings.SetQualityLevel(qualityIndex);
         AudioManager.Instance.PlayEffect("UI_Twinkle");
+    }
+
+    public void OnHoverIn()
+    {
+        Cursor.SetCursor(_cursors[1], Vector2.zero, CursorMode.Auto);
+    }
+
+    public void OnHoverOut()
+    {
+        Cursor.SetCursor(_cursors[0], Vector2.zero, CursorMode.Auto);
     }
 }

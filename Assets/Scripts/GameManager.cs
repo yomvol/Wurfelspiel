@@ -119,6 +119,9 @@ public class GameManager : Singleton<GameManager>
 
     private void HandleStarting()
     {
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
+
         _roundNumber = 1;
         _humanPlayer = _player.GetComponent<HumanPlayer>();
         _computerPlayer = _computerEnemy.GetComponent<ComputerPlayer>();
@@ -169,7 +172,8 @@ public class GameManager : Singleton<GameManager>
 
     private void HandleReroll(bool isHumanPlayerRerolling)
     {
-        DiceZoomInCamera.Priority = 11;
+        DiceZoomInCamera.Priority = 20;
+        _humanPlayer.ThrowTrackingCamera.Priority = 6;
 
         // Every reroll is optional
         if (isHumanPlayerRerolling)
